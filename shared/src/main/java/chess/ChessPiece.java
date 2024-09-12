@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Represents a single chess piece
@@ -18,6 +19,8 @@ public class ChessPiece {
         this.pieceColor = pieceColor;
         this.type = type;
     }
+
+
 
     /**
      * The various different chess piece options
@@ -56,16 +59,24 @@ public class ChessPiece {
         Collection<ChessMove> moves = new ArrayList<>();
         switch (type) {
             case BISHOP:
+                //right up diagonal
                 for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() + 1; r < 9 && c < 9; r++, c++) {
-                    ChessPosition newPosition = new ChessPosition(r, c);
-                    moves.add(new ChessMove(myPosition, newPosition, null));
+                    moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                }
+                //left up diagonal
+                for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() - 1; r < 9 && c > 0; r++, c--) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                }
+                //bottom left diagonal
+                for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() - 1; r > 0 && c > 0; r--, c--) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                }
+                //bottom right diagonal
+                for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() + 1; r > 0 && c < 9; r--, c++) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
                 }
                 break;
         }
-        /*if (getPieceType().equals(PieceType.BISHOP)) {
-            System.out.print("BISHOP");
-        }*/
-
         return moves;
     }
 }
