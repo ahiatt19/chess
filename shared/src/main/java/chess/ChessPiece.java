@@ -61,30 +61,37 @@ public class ChessPiece {
             case BISHOP:
                 //right up diagonal
                 for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() + 1; r < 9 && c < 9; r++, c++) {
-                    if (IsValidMove(board, myPosition, moves, r, c)) break;
+                    if (isvalidmove(board, myPosition, moves, r, c)) break;
                 }
+                //System.out.println("BREAKS");
                 //left up diagonal
                 for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() - 1; r < 9 && c > 0; r++, c--) {
-                    if (IsValidMove(board, myPosition, moves, r, c)) break;
+                    if (isvalidmove(board, myPosition, moves, r, c)) break;
                 }
                 //bottom left diagonal
                 for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() - 1; r > 0 && c > 0; r--, c--) {
-                    if (IsValidMove(board, myPosition, moves, r, c)) break;
+                    if (isvalidmove(board, myPosition, moves, r, c)) break;
                 }
                 //bottom right diagonal
                 for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() + 1; r > 0 && c < 9; r--, c++) {
-                    if (IsValidMove(board, myPosition, moves, r, c)) break;
+                    if (isvalidmove(board, myPosition, moves, r, c)) break;
+                    
                 }
                 break;
         }
         return moves;
     }
 
-    public boolean IsValidMove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int r, int c) {
+    public boolean isvalidmove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int r, int c) {
         if (board.isEmpty(new ChessPosition(r, c))) {
+            //System.out.println("EMPTY");
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
         } else if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor) {
+            //System.out.println("INVALID");
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+            return true;
+        } else if (board.getPiece(new ChessPosition(r, c)).pieceColor == pieceColor) {
+            //System.out.println("SAME INVALID");
             return true;
         }
         return false;

@@ -48,6 +48,7 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         //System.out.println(position.getRow() + " " + position.getColumn());
+        //System.out.print("in it:" + squares[position.getRow()][position.getColumn()]);
         return squares[position.getRow()][position.getColumn()];
     }
 
