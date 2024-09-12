@@ -61,19 +61,39 @@ public class ChessPiece {
             case BISHOP:
                 //right up diagonal
                 for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() + 1; r < 9 && c < 9; r++, c++) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                    if (board.isEmpty(new ChessPosition(r, c))) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                    } else if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                        break;
+                    }
                 }
                 //left up diagonal
                 for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() - 1; r < 9 && c > 0; r++, c--) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                    if (board.isEmpty(new ChessPosition(r, c))) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                    } else if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                        break;
+                    }
                 }
                 //bottom left diagonal
                 for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() - 1; r > 0 && c > 0; r--, c--) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                    if (board.isEmpty(new ChessPosition(r, c))) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                    } else if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                        break;
+                    }
                 }
                 //bottom right diagonal
                 for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() + 1; r > 0 && c < 9; r--, c++) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                    if (board.isEmpty(new ChessPosition(r, c))) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                    } else if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                        break;
+                    }
                 }
                 break;
         }
