@@ -10,11 +10,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] squares = new ChessPiece[8][8];
+    private final ChessPiece[][] squares = new ChessPiece[8][8];
 
-    public ChessBoard() {
-        
-    }
+    public ChessBoard() {}
 
     @Override
     public boolean equals(Object o) {
@@ -29,6 +27,17 @@ public class ChessBoard {
         return Arrays.deepHashCode(squares);
     }
 
+    @Override
+    public String toString() {
+        return "ChessBoard{" +
+                "squares=" + Arrays.toString(squares) +
+                '}';
+    }
+
+    public int[] toarrayindex(int row, int col) {
+        return new int[]{8 - row, col - 1};
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -36,7 +45,8 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()][position.getColumn()] = piece;
+        int[] cor_indexes = toarrayindex(position.getRow(), position.getColumn());
+        squares[cor_indexes[0]][cor_indexes[1]] = piece;
     }
 
     /**
@@ -47,12 +57,14 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        //System.out.println(position.getRow() + " " + position.getColumn());
-        //System.out.print("in it:" + squares[position.getRow()][position.getColumn()]);
-        return squares[position.getRow()][position.getColumn()];
+        //System.out.println("Orig: " + position.getRow() + " " + position.getColumn());
+        int[] cor_indexes = toarrayindex(position.getRow(), position.getColumn());
+        //System.out.println("Fixed: " + cor_indexes[0] + " " + cor_indexes[1]);
+        return squares[cor_indexes[0]][cor_indexes[1]];
     }
 
     public boolean isEmpty(ChessPosition position) {
+        System.out.println("EMPTY IN BOARD");
         return getPiece(position) == null;
     }
 

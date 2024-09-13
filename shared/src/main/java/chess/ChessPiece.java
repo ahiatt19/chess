@@ -20,7 +20,13 @@ public class ChessPiece {
         this.type = type;
     }
 
-
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceColor=" + pieceColor +
+                ", type=" + type +
+                '}';
+    }
 
     /**
      * The various different chess piece options
