@@ -64,7 +64,7 @@ public class ChessBoard {
     }
 
     public boolean isEmpty(ChessPosition position) {
-        System.out.println("EMPTY IN BOARD");
+        //System.out.println("EMPTY IN BOARD");
         return getPiece(position) == null;
     }
 
