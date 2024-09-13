@@ -89,12 +89,15 @@ public class ChessPiece {
                 for (int r = myPosition.getRow() + 1; r < 9; r++) {
                     if (isvalidmove(board, myPosition, moves, r, myPosition.getColumn())) break;
                 }
+                //RIGHT
                 for (int c = myPosition.getColumn() + 1; c < 9; c++) {
                     if (isvalidmove(board, myPosition, moves, myPosition.getRow(), c)) break;
                 }
+                //DOWN
                 for (int r = myPosition.getRow() - 1; r > 0; r--) {
                     if (isvalidmove(board, myPosition, moves, r, myPosition.getColumn())) break;
                 }
+                //LEFT
                 for (int c = myPosition.getColumn() - 1; c > 0; c--) {
                     if (isvalidmove(board, myPosition, moves, myPosition.getRow(), c)) break;
                 }
