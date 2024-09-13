@@ -101,23 +101,57 @@ public class ChessPiece {
                 for (int c = myPosition.getColumn() - 1; c > 0; c--) {
                     if (isvalidmove(board, myPosition, moves, myPosition.getRow(), c)) break;
                 }
+                break;
+            case PAWN:
+                if (pieceColor == ChessGame.TeamColor.WHITE) {
+                    if (myPosition.getRow() == 2)
+                        isvalidmove(board, myPosition, moves, myPosition.getRow() + 2, myPosition.getColumn());
+                    // to see if we can kill left
+                    if (pawncankill(board, myPosition.getRow() + 1, myPosition.getColumn() - 1))
+                        isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() - 1);
+                    //to see if we can kill right
+                    if (pawncankill(board, myPosition.getRow() + 1, myPosition.getColumn() + 1))
+                        isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() + 1);
+                    //move forward
+                    isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn());
+                } else if (pieceColor == ChessGame.TeamColor.BLACK) {
+                    if (myPosition.getRow() == 7)
+                        isvalidmove(board, myPosition, moves, myPosition.getRow() - 2, myPosition.getColumn());
+                    //to see if we can kill left
+                    if (pawncankill(board, myPosition.getRow() - 1, myPosition.getColumn() - 1))
+                        isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn() - 1);
+                    // to see if we can kill right
+                    if (pawncankill(board, myPosition.getRow() - 1, myPosition.getColumn() + 1))
+                        isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn() + 1);
+                    //move forward
+                    isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn());
+                }
+                break;
         }
-
         return moves;
     }
 
+    public boolean pawncankill(ChessBoard board, int r, int c) {
+        //System.out.println(r + "," + c + " " + !board.isEmpty(new ChessPosition(r, c)));
+        return !board.isEmpty(new ChessPosition(r, c)) && board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor;
+    }
+
     public boolean isvalidmove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int r, int c) {
-        if (board.isEmpty(new ChessPosition(r, c))) {
-            //System.out.println("EMPTY");
+        //pawn move forward logic
+        if (type == PieceType.PAWN && board.isEmpty(new ChessPosition(r, c)) && (pieceColor == ChessGame.TeamColor.WHITE && r == 8) ||
+                    (pieceColor == ChessGame.TeamColor.BLACK && r == 1)) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(r, c), PieceType.QUEEN));
+            moves.add(new ChessMove(myPosition, new ChessPosition(r, c), PieceType.BISHOP));
+            moves.add(new ChessMove(myPosition, new ChessPosition(r, c), PieceType.ROOK));
+            moves.add(new ChessMove(myPosition, new ChessPosition(r, c), PieceType.KNIGHT));
+        } else if (board.isEmpty(new ChessPosition(r, c))) {
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
-        } else if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor) {
+        } else //System.out.println("SAME INVALID");
+            if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor) {
             //System.out.println("INVALID");
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
             return true;
-        } else if (board.getPiece(new ChessPosition(r, c)).pieceColor == pieceColor) {
-            //System.out.println("SAME INVALID");
-            return true;
-        }
+        } //else return board.getPiece(new ChessPosition(r, c)).pieceColor == pieceColor;
         return false;
     }
 }
