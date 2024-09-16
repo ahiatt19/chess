@@ -65,22 +65,18 @@ public class ChessPiece {
         switch (type) {
             case BISHOP:
                 //right up diagonal
-                for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() + 1; r < 9 && c < 9; r++, c++) {
+                for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() + 1; r < 9 && c < 9; r++, c++)
                     if (isvalidmove(board, myPosition, moves, r, c)) break;
-                }
                 //System.out.println("BREAKS");
                 //left up diagonal
-                for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() - 1; r < 9 && c > 0; r++, c--) {
+                for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() - 1; r < 9 && c > 0; r++, c--)
                     if (isvalidmove(board, myPosition, moves, r, c)) break;
-                }
                 //bottom left diagonal
-                for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() - 1; r > 0 && c > 0; r--, c--) {
+                for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() - 1; r > 0 && c > 0; r--, c--)
                     if (isvalidmove(board, myPosition, moves, r, c)) break;
-                }
                 //bottom right diagonal
-                for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() + 1; r > 0 && c < 9; r--, c++) {
+                for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() + 1; r > 0 && c < 9; r--, c++)
                     if (isvalidmove(board, myPosition, moves, r, c)) break;
-                }
                 break;
             case ROOK:
                 //UP
@@ -129,6 +125,34 @@ public class ChessPiece {
                     pawnisvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn(), false);
                 }
                 break;
+            case QUEEN:
+                //UP
+                for (int r = myPosition.getRow() + 1; r < 9; r++)
+                    if (isvalidmove(board, myPosition, moves, r, myPosition.getColumn())) break;
+                //RIGHT
+                for (int c = myPosition.getColumn() + 1; c < 9; c++)
+                    if (isvalidmove(board, myPosition, moves, myPosition.getRow(), c)) break;
+                //DOWN
+                for (int r = myPosition.getRow() - 1; r > 0; r--)
+                    if (isvalidmove(board, myPosition, moves, r, myPosition.getColumn())) break;
+                //LEFT
+                for (int c = myPosition.getColumn() - 1; c > 0; c--)
+                    if (isvalidmove(board, myPosition, moves, myPosition.getRow(), c)) break;
+                //right up diagonal
+                for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() + 1; r < 9 && c < 9; r++, c++)
+                    if (isvalidmove(board, myPosition, moves, r, c)) break;
+                //System.out.println("BREAKS");
+                //left up diagonal
+                for (int r = myPosition.getRow() + 1, c = myPosition.getColumn() - 1; r < 9 && c > 0; r++, c--)
+                    if (isvalidmove(board, myPosition, moves, r, c)) break;
+                //bottom left diagonal
+                for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() - 1; r > 0 && c > 0; r--, c--)
+                    if (isvalidmove(board, myPosition, moves, r, c)) break;
+                //bottom right diagonal
+                for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() + 1; r > 0 && c < 9; r--, c++)
+                    if (isvalidmove(board, myPosition, moves, r, c)) break;
+                break;
+            case
         }
         return moves;
     }
