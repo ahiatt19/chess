@@ -80,21 +80,17 @@ public class ChessPiece {
                 break;
             case ROOK:
                 //UP
-                for (int r = myPosition.getRow() + 1; r < 9; r++) {
+                for (int r = myPosition.getRow() + 1; r < 9; r++)
                     if (isvalidmove(board, myPosition, moves, r, myPosition.getColumn())) break;
-                }
                 //RIGHT
-                for (int c = myPosition.getColumn() + 1; c < 9; c++) {
+                for (int c = myPosition.getColumn() + 1; c < 9; c++)
                     if (isvalidmove(board, myPosition, moves, myPosition.getRow(), c)) break;
-                }
                 //DOWN
-                for (int r = myPosition.getRow() - 1; r > 0; r--) {
+                for (int r = myPosition.getRow() - 1; r > 0; r--)
                     if (isvalidmove(board, myPosition, moves, r, myPosition.getColumn())) break;
-                }
                 //LEFT
-                for (int c = myPosition.getColumn() - 1; c > 0; c--) {
+                for (int c = myPosition.getColumn() - 1; c > 0; c--)
                     if (isvalidmove(board, myPosition, moves, myPosition.getRow(), c)) break;
-                }
                 break;
             case PAWN:
                 if (pieceColor == ChessGame.TeamColor.WHITE) {
@@ -152,7 +148,25 @@ public class ChessPiece {
                 for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() + 1; r > 0 && c < 9; r--, c++)
                     if (isvalidmove(board, myPosition, moves, r, c)) break;
                 break;
-            case
+            case KING:
+                if (myPosition.getRow() + 1 < 9) {
+                    isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn());
+                    if (myPosition.getColumn() - 1 > 0)
+                        isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() - 1);
+                    if (myPosition.getColumn() + 1 < 9)
+                        isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() + 1);
+                }
+                if (myPosition.getRow() - 1 > 0) {
+                    isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn());
+                    if (myPosition.getColumn() - 1 > 0)
+                        isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn() - 1);
+                    if (myPosition.getColumn() + 1 < 9)
+                        isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn() + 1);
+                }
+                if (myPosition.getColumn() + 1 < 9)
+                    isvalidmove(board, myPosition, moves, myPosition.getRow(), myPosition.getColumn() + 1);
+                if (myPosition.getColumn() - 1 > 0)
+                    isvalidmove(board, myPosition, moves, myPosition.getRow(), myPosition.getColumn() - 1);
         }
         return moves;
     }
