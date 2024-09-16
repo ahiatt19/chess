@@ -149,24 +149,33 @@ public class ChessPiece {
                     if (isvalidmove(board, myPosition, moves, r, c)) break;
                 break;
             case KING:
+                //UP
                 if (myPosition.getRow() + 1 < 9) {
                     isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn());
+                    // UP to LEFT
                     if (myPosition.getColumn() - 1 > 0)
                         isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() - 1);
+                    // UP to RIGHT
                     if (myPosition.getColumn() + 1 < 9)
                         isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() + 1);
                 }
+                //DOWN
                 if (myPosition.getRow() - 1 > 0) {
                     isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn());
+                    // DOWN to LEFT
                     if (myPosition.getColumn() - 1 > 0)
                         isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn() - 1);
+                    // DOWN to RIGHT
                     if (myPosition.getColumn() + 1 < 9)
                         isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn() + 1);
                 }
+                // RIGHT
                 if (myPosition.getColumn() + 1 < 9)
                     isvalidmove(board, myPosition, moves, myPosition.getRow(), myPosition.getColumn() + 1);
+                //LEFT
                 if (myPosition.getColumn() - 1 > 0)
                     isvalidmove(board, myPosition, moves, myPosition.getRow(), myPosition.getColumn() - 1);
+                break;
             case KNIGHT:
                 //UP to L and R
                 if (myPosition.getRow() + 2 < 9) {
@@ -196,6 +205,7 @@ public class ChessPiece {
                     if (myPosition.getRow() + 1 < 9)
                         isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() - 2);
                 }
+                break;
         }
         return moves;
     }
