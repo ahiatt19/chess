@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Represents a single chess piece
@@ -104,26 +103,30 @@ public class ChessPiece {
             case PAWN:
                 if (pieceColor == ChessGame.TeamColor.WHITE) {
                     if (myPosition.getRow() == 2)
-                        isvalidmove(board, myPosition, moves, myPosition.getRow() + 2, myPosition.getColumn());
+                        if (board.isEmpty(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn())) &&
+                                board.isEmpty(new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn())))
+                            pawnisvalidmove(board, myPosition, moves, myPosition.getRow() + 2, myPosition.getColumn(), true);
                     // to see if we can kill left
                     if (pawncankill(board, myPosition.getRow() + 1, myPosition.getColumn() - 1))
-                        isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() - 1);
+                        pawnisvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() - 1, true);
                     //to see if we can kill right
                     if (pawncankill(board, myPosition.getRow() + 1, myPosition.getColumn() + 1))
-                        isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() + 1);
+                        pawnisvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn() + 1, true);
                     //move forward
-                    isvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn());
+                    pawnisvalidmove(board, myPosition, moves, myPosition.getRow() + 1, myPosition.getColumn(), false);
                 } else if (pieceColor == ChessGame.TeamColor.BLACK) {
                     if (myPosition.getRow() == 7)
-                        isvalidmove(board, myPosition, moves, myPosition.getRow() - 2, myPosition.getColumn());
+                        if (board.isEmpty(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn())) &&
+                                board.isEmpty(new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn())))
+                            pawnisvalidmove(board, myPosition, moves, myPosition.getRow() - 2, myPosition.getColumn(), true);
                     //to see if we can kill left
                     if (pawncankill(board, myPosition.getRow() - 1, myPosition.getColumn() - 1))
-                        isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn() - 1);
+                        pawnisvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn() - 1, true);
                     // to see if we can kill right
                     if (pawncankill(board, myPosition.getRow() - 1, myPosition.getColumn() + 1))
-                        isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn() + 1);
+                        pawnisvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn() + 1, true);
                     //move forward
-                    isvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn());
+                    pawnisvalidmove(board, myPosition, moves, myPosition.getRow() - 1, myPosition.getColumn(), false);
                 }
                 break;
         }
@@ -135,7 +138,7 @@ public class ChessPiece {
         return !board.isEmpty(new ChessPosition(r, c)) && board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor;
     }
 
-    public boolean pawnisvalidmove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int r, int c) {
+    public boolean pawnisvalidmove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int r, int c, boolean diagonal ) {
         //pawn move forward logic
         if (type == PieceType.PAWN && board.isEmpty(new ChessPosition(r, c)) && (pieceColor == ChessGame.TeamColor.WHITE && r == 8) ||
                 (pieceColor == ChessGame.TeamColor.BLACK && r == 1)) {
@@ -145,13 +148,10 @@ public class ChessPiece {
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), PieceType.KNIGHT));
         } else if (board.isEmpty(new ChessPosition(r, c))) {
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
-        } else //System.out.println("SAME INVALID");
-            if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor) {
+        } else if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor && diagonal) {
                 //System.out.println("INVALID");
                 moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
-                return true;
-            } //else return board.getPiece(new ChessPosition(r, c)).pieceColor == pieceColor;
-        return false;
+        } return false;
     }
 
     public boolean isvalidmove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int r, int c) {
