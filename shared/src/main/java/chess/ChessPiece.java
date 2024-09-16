@@ -81,7 +81,6 @@ public class ChessPiece {
                 //bottom right diagonal
                 for (int r = myPosition.getRow() - 1, c = myPosition.getColumn() + 1; r > 0 && c < 9; r--, c++) {
                     if (isvalidmove(board, myPosition, moves, r, c)) break;
-                    
                 }
                 break;
             case ROOK:
@@ -136,10 +135,10 @@ public class ChessPiece {
         return !board.isEmpty(new ChessPosition(r, c)) && board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor;
     }
 
-    public boolean isvalidmove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int r, int c) {
+    public boolean pawnisvalidmove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int r, int c) {
         //pawn move forward logic
         if (type == PieceType.PAWN && board.isEmpty(new ChessPosition(r, c)) && (pieceColor == ChessGame.TeamColor.WHITE && r == 8) ||
-                    (pieceColor == ChessGame.TeamColor.BLACK && r == 1)) {
+                (pieceColor == ChessGame.TeamColor.BLACK && r == 1)) {
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), PieceType.QUEEN));
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), PieceType.BISHOP));
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), PieceType.ROOK));
@@ -148,10 +147,23 @@ public class ChessPiece {
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
         } else //System.out.println("SAME INVALID");
             if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor) {
+                //System.out.println("INVALID");
+                moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+                return true;
+            } //else return board.getPiece(new ChessPosition(r, c)).pieceColor == pieceColor;
+        return false;
+    }
+
+    public boolean isvalidmove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int r, int c) {
+        //pawn move forward logic
+        if (board.isEmpty(new ChessPosition(r, c))) {
+            //System.out.println("IS EMPTY");
+            moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
+        } else if (board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor) {
             //System.out.println("INVALID");
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
             return true;
-        } //else return board.getPiece(new ChessPosition(r, c)).pieceColor == pieceColor;
+        } else return board.getPiece(new ChessPosition(r, c)).pieceColor == pieceColor;
         return false;
     }
 }
