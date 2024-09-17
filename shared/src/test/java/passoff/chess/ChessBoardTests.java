@@ -62,7 +62,7 @@ public class ChessBoardTests {
                 ChessPiece piece = board.getPiece(position);
                 if(piece != null) {
                     Assertions.assertDoesNotThrow(() -> piece.pieceMoves(board, position));
-                }
+                }//random
             }
         }
     }
