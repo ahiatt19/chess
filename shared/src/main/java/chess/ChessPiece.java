@@ -260,7 +260,9 @@ public class ChessPiece {
 
     public boolean pawncankill(ChessBoard board, int r, int c) {
         //System.out.println(r + "," + c + " " + !board.isEmpty(new ChessPosition(r, c)));
-        return !board.isEmpty(new ChessPosition(r, c)) && board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor;
+        if (r < 9 && c < 9 && r > 0 && c > 0)
+            return !board.isEmpty(new ChessPosition(r, c)) && board.getPiece(new ChessPosition(r, c)).pieceColor != pieceColor;
+        return false;
     }
 
     public boolean pawnisvalidmove(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int r, int c, boolean diagonal ) {

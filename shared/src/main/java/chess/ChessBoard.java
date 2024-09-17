@@ -47,8 +47,12 @@ public class ChessBoard {
                 squares[7][4] + "|" + squares[7][5] + "|" + squares[7][6] + "|" + squares[7][7] + "|" + "\n";
     }
 
-    public int[] toarrayindex(int row, int col) {
-        return new int[]{8 - row, col - 1};
+    public int toarrayindex(int index, char kind) {
+        if (kind == 'r')
+            return 8 - index;
+        if (kind == 'c')
+            return index - 1;
+        return -225;
     }
 
     /**
@@ -58,8 +62,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        int[] cor_indexes = toarrayindex(position.getRow(), position.getColumn());
-        squares[cor_indexes[0]][cor_indexes[1]] = piece;
+        int correct_row = toarrayindex(position.getRow(), 'r');
+        int correct_col = toarrayindex(position.getColumn(), 'c');
+        squares[correct_row][correct_col] = piece;
     }
 
     /**
@@ -70,14 +75,14 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        //System.out.println("Orig: " + position.getRow() + " " + position.getColumn());
-        int[] cor_indexes = toarrayindex(position.getRow(), position.getColumn());
-        //System.out.println("Fixed: " + cor_indexes[0] + " " + cor_indexes[1]);
-        return squares[cor_indexes[0]][cor_indexes[1]];
+        System.out.print("O: " + position.getRow() + " " + position.getColumn() + ", ");
+        int correct_row = toarrayindex(position.getRow(), 'r');
+        int correct_col = toarrayindex(position.getColumn(), 'c');
+        System.out.println("F: " + correct_row + " " + correct_col);
+        return squares[correct_row][correct_col];
     }
 
     public boolean isEmpty(ChessPosition position) {
-        //System.out.println("EMPTY IN BOARD");
         return getPiece(position) == null;
     }
 
