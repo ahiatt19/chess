@@ -75,10 +75,10 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        System.out.print("O: " + position.getRow() + " " + position.getColumn() + ", ");
+        //System.out.print("O: " + position.getRow() + " " + position.getColumn() + ", ");
         int correct_row = toarrayindex(position.getRow(), 'r');
         int correct_col = toarrayindex(position.getColumn(), 'c');
-        System.out.println("F: " + correct_row + " " + correct_col);
+        //System.out.println("F: " + correct_row + " " + correct_col);
         return squares[correct_row][correct_col];
     }
 

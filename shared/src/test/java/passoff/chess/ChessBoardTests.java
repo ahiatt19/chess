@@ -56,14 +56,10 @@ public class ChessBoardTests {
     public void pieceMoveAllPieces() {
         var board = new ChessBoard();
         board.resetBoard();
-        System.out.println(board);
         for(int i = 1; i <= 8; i++) {
             for(int j = 1; j <= 8; j++) {
-                System.out.println("i: " + i + ", j: " + j);
                 ChessPosition position = new ChessPosition(i, j);
-                System.out.println(position.toString());
                 ChessPiece piece = board.getPiece(position);
-                System.out.println(piece);
                 if(piece != null) {
                     Assertions.assertDoesNotThrow(() -> piece.pieceMoves(board, position));
                 }
