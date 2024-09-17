@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -21,10 +22,57 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return "ChessPiece{" +
-                "pieceColor=" + pieceColor +
-                ", type=" + type +
-                '}';
+        return getColorPiece();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hashCode(pieceColor);
+        result = 31 * result + Objects.hashCode(type);
+        return result;
+    }
+
+    public String getColorPiece() {
+        if (getPieceType() == PieceType.KNIGHT) {
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
+                    return "n";
+            return "N";
+        }
+        if (getPieceType() == PieceType.PAWN) {
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
+                return "p";
+            return "P";
+        }
+        if (getPieceType() == PieceType.KING) {
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
+                return "k";
+            return "K";
+        }
+        if (getPieceType() == PieceType.QUEEN) {
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
+                return "q";
+            return "Q";
+        }
+        if (getPieceType() == PieceType.BISHOP) {
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
+                return "b";
+            return "B";
+        }
+        if (getPieceType() == PieceType.ROOK) {
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
+                return "r";
+            return "R";
+        }
+        return " ";
     }
 
     /**
