@@ -24,7 +24,7 @@ public class ChessMove {
     @Override
     public String toString() {
         /*"S:[" + startPosition.getRow() + ", "+ startPosition.getColumn() + "]" +*/
-        return "[" + endPosition.getRow() + ","+ endPosition.getColumn() + "]: " + promotionPiece;
+        return "[" + endPosition.getRow() + ","+ endPosition.getColumn() + "]";// + promotionPiece;
     }
 
     @Override

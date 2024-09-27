@@ -19,16 +19,18 @@ public class ChessPosition {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessPosition that = (ChessPosition) o;
+        if (!(o instanceof ChessPosition that)) return false;
+
         return row == that.row && col == that.col;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(row, col);
+        int result = row;
+        result = 31 * result + col;
+        return result;
     }
 
     @Override
