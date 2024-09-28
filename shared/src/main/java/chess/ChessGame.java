@@ -71,11 +71,22 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = game.getPiece(startPosition);
         Collection<ChessMove> moves = piece.pieceMoves(game, startPosition);
-        if (isInCheck(piece.getTeamColor())) {
-            System.out.println("IN CHECK");
-            return moves;
-        }
-        return moves;
+        TeamColor color = piece.getTeamColor();
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        if (isInCheck(color)) {
+            for (ChessMove move : moves) {
+                //System.out.println(move.getEndPosition());
+                //game.removePiece(move.getStartPosition());
+                ChessPiece tempPiece = game.getPiece(move.getEndPosition());
+                game.addPiece(move.getEndPosition(), piece);
+                //System.out.println(game);
+                if (!isInCheck(color))
+                    validMoves.add(move);
+                game.removePiece(move.getEndPosition());
+                game.addPiece(move.getEndPosition(), tempPiece);
+            }
+        } else {validMoves = moves;}
+        return validMoves;
     }
 
     /**
@@ -114,10 +125,8 @@ public class ChessGame {
         ChessPosition kingPosition = new ChessPosition(0, 0);
         //Find the kings position for the teamColor
         for (ChessPosition pos : teamPositions) {
-            if (game.getPiece(pos).getPieceType() == ChessPiece.PieceType.KING) {
+            if (game.getPiece(pos).getPieceType() == ChessPiece.PieceType.KING)
                 kingPosition = pos;
-
-            }
         }
         //switch the enemy kings colors based on the teamColor
         if (teamColor == TeamColor.BLACK)
@@ -132,6 +141,7 @@ public class ChessGame {
                     return true;
                 }
             }
+
         }
         return false;
     }
