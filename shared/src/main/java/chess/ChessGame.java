@@ -85,7 +85,17 @@ public class ChessGame {
                 game.removePiece(move.getEndPosition());
                 game.addPiece(move.getEndPosition(), tempPiece);
             }
-        } else {validMoves = moves;}
+        }else {
+            for (ChessMove m : moves) {
+                ChessPosition currPosition = m.getStartPosition();
+                game.removePiece(currPosition);
+                ChessPiece tempPiece = game.getPiece(m.getEndPosition());
+                game.addPiece(m.getEndPosition(), piece);
+                if (!isInCheck(color))
+                    validMoves.add(m);
+                game.removePiece(m.getEndPosition());
+                game.addPiece(m.getEndPosition(), tempPiece);
+            }}
         return validMoves;
     }
 
