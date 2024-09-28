@@ -85,7 +85,7 @@ public class ChessGame {
                 game.removePiece(move.getEndPosition());
                 game.addPiece(move.getEndPosition(), tempPiece);
             }
-        }else {
+        }else {//cant move
             for (ChessMove m : moves) {
                 ChessPosition currPosition = m.getStartPosition();
                 game.removePiece(currPosition);
