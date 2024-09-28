@@ -12,6 +12,7 @@ import java.util.Objects;
  */
 public class ChessGame {
     private ChessBoard game;
+    private TeamColor currentTeamTurn;
 
     public ChessGame() {
     }
@@ -50,7 +51,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        currentTeamTurn = team;
     }
 
     /**
@@ -75,17 +76,14 @@ public class ChessGame {
         Collection<ChessMove> validMoves = new ArrayList<>();
         if (isInCheck(color)) {
             for (ChessMove move : moves) {
-                //System.out.println(move.getEndPosition());
-                //game.removePiece(move.getStartPosition());
                 ChessPiece tempPiece = game.getPiece(move.getEndPosition());
                 game.addPiece(move.getEndPosition(), piece);
-                //System.out.println(game);
                 if (!isInCheck(color))
                     validMoves.add(move);
                 game.removePiece(move.getEndPosition());
                 game.addPiece(move.getEndPosition(), tempPiece);
             }
-        }else {//cant move
+        }else {
             for (ChessMove m : moves) {
                 ChessPosition currPosition = m.getStartPosition();
                 game.removePiece(currPosition);
@@ -106,7 +104,9 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));
+        game.removePiece(move.getStartPosition());
+
     }
     /**
      * This function is to check where all the pieces are on the board for a certain team.
@@ -192,6 +192,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return game;
     }
 }
