@@ -125,8 +125,10 @@ public class ChessGame {
             if (good_move) {
                 System.out.println(game);
                 System.out.println(move.getEndPosition());
-                System.out.println(game.getPiece(move.getStartPosition()));
-                game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));
+                //System.out.println(game.getPiece(move.getStartPosition()));
+                if (game.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.PAWN) {
+                    game.addPiece(move.getEndPosition(), new ChessPiece(game.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece()));
+                } else {game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));}
                 game.removePiece(move.getStartPosition());
                 System.out.println(game);
             } else {throw new chess.InvalidMoveException("INVALID");}
