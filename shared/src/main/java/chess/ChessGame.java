@@ -104,9 +104,12 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));
-        game.removePiece(move.getStartPosition());
-
+        try {
+            game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));
+            game.removePiece(move.getStartPosition());
+        } catch (NullPointerException n) {
+            throw new chess.InvalidMoveException("INVALID");
+        }
     }
     /**
      * This function is to check where all the pieces are on the board for a certain team.
