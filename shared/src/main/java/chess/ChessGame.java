@@ -78,10 +78,12 @@ public class ChessGame {
             for (ChessMove move : moves) {
                 ChessPiece tempPiece = game.getPiece(move.getEndPosition());
                 game.addPiece(move.getEndPosition(), piece);
+                game.removePiece(move.getStartPosition());
                 if (!isInCheck(color))
                     validMoves.add(move);
                 game.removePiece(move.getEndPosition());
                 game.addPiece(move.getEndPosition(), tempPiece);
+                game.addPiece(move.getStartPosition(), piece);
             }
         }else {
             for (ChessMove m : moves) {
@@ -89,11 +91,16 @@ public class ChessGame {
                 game.removePiece(currPosition);
                 ChessPiece tempPiece = game.getPiece(m.getEndPosition());
                 game.addPiece(m.getEndPosition(), piece);
+                //System.out.println(game);
                 if (!isInCheck(color))
                     validMoves.add(m);
                 game.removePiece(m.getEndPosition());
                 game.addPiece(m.getEndPosition(), tempPiece);
-            }}
+                game.addPiece(currPosition, piece);
+            }
+
+        }
+
         return validMoves;
     }
 
@@ -105,8 +112,24 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         try {
-            game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));
-            game.removePiece(move.getStartPosition());
+            boolean good_move = false;
+            //System.out.println(game);
+            Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+            for (ChessMove m : validMoves) {
+                if (m.getEndPosition().getRow() == move.getEndPosition().getRow() &&
+                        m.getEndPosition().getColumn() == move.getEndPosition().getColumn()) {
+                    good_move = true;
+                    break;
+                }
+            }
+            if (good_move) {
+                System.out.println(game);
+                System.out.println(move.getEndPosition());
+                System.out.println(game.getPiece(move.getStartPosition()));
+                game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));
+                game.removePiece(move.getStartPosition());
+                System.out.println(game);
+            } else {throw new chess.InvalidMoveException("INVALID");}
         } catch (NullPointerException n) {
             throw new chess.InvalidMoveException("INVALID");
         }
