@@ -126,7 +126,7 @@ public class ChessGame {
                 System.out.println(game);
                 System.out.println(move.getEndPosition());
                 //System.out.println(game.getPiece(move.getStartPosition()));
-                if (game.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.PAWN) {
+                if (game.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
                     game.addPiece(move.getEndPosition(), new ChessPiece(game.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece()));
                 } else {game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));}
                 game.removePiece(move.getStartPosition());
