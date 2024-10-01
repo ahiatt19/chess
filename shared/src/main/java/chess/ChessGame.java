@@ -11,13 +11,14 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private ChessBoard game;
-    private TeamColor currentTeamTurn;
+    private static ChessBoard game;
+    private static TeamColor currentTeamTurn;
 
     public ChessGame() {
-        this.game = new ChessBoard();
+        game = new ChessBoard();
         game.resetBoard();
-        this.currentTeamTurn = TeamColor.WHITE;
+        //System.out.println(game);
+        currentTeamTurn = TeamColor.WHITE;
     }
 
     @Override
@@ -140,9 +141,8 @@ public class ChessGame {
         Collection<ChessPosition> positions = new ArrayList<>();
         for (int i = 1; i < 9; i++) {
             for (int u = 1; u < 9; u++) {
-                if (game.getPiece(new ChessPosition(i, u)) != null && game.getPiece(new ChessPosition(i, u)).getTeamColor() == color) {
+                if (game.getPiece(new ChessPosition(i, u)) != null && game.getPiece(new ChessPosition(i, u)).getTeamColor() == color)
                     positions.add(new ChessPosition(i, u));
-                }
             }
         }
         return positions;
@@ -157,26 +157,24 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
         TeamColor enemyColor = TeamColor.BLACK;
+        //switch the enemy kings colors based on the teamColor
+        if (teamColor == TeamColor.BLACK)
+            enemyColor = TeamColor.WHITE;
         ChessPosition kingPosition = new ChessPosition(0, 0);
         //Find the kings position for the teamColor
         for (ChessPosition pos : teamPositions) {
             if (game.getPiece(pos).getPieceType() == ChessPiece.PieceType.KING)
                 kingPosition = pos;
         }
-        //switch the enemy kings colors based on the teamColor
-        if (teamColor == TeamColor.BLACK)
-            enemyColor = TeamColor.WHITE;
         Collection<ChessPosition> enemyPositions = getTeamPositions(enemyColor);
         for (ChessPosition enemyPos : enemyPositions) {
             ChessPiece enemyPiece = game.getPiece(enemyPos);
             Collection<ChessMove> pieceMoves = enemyPiece.pieceMoves(game, enemyPos);
             for (ChessMove move : pieceMoves) {
                 ChessPosition enemyMove = move.getEndPosition();
-                if (enemyMove.getRow() == kingPosition.getRow() && enemyMove.getColumn() == kingPosition.getColumn()) {
+                if (enemyMove.getRow() == kingPosition.getRow() && enemyMove.getColumn() == kingPosition.getColumn())
                     return true;
-                }
             }
-
         }
         return false;
     }
@@ -190,9 +188,10 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
         for (ChessPosition pos : teamPositions) {
-            if (validMoves(pos) != null)
+            Collection<ChessMove> moves = validMoves(pos);
+            for (ChessMove m : moves)
                 return false;
-            }
+        }
         return true;
     }
 
@@ -220,6 +219,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
+        //System.out.println(board);
         game = board;
     }
 
