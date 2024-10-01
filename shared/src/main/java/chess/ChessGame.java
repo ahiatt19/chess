@@ -15,6 +15,9 @@ public class ChessGame {
     private TeamColor currentTeamTurn;
 
     public ChessGame() {
+        this.game = new ChessBoard();
+        game.resetBoard();
+        this.currentTeamTurn = TeamColor.WHITE;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return currentTeamTurn;
     }
 
     /**
@@ -98,9 +101,7 @@ public class ChessGame {
                 game.addPiece(m.getEndPosition(), tempPiece);
                 game.addPiece(currPosition, piece);
             }
-
         }
-
         return validMoves;
     }
 
@@ -123,14 +124,10 @@ public class ChessGame {
                 }
             }
             if (good_move) {
-                System.out.println(game);
-                System.out.println(move.getEndPosition());
-                //System.out.println(game.getPiece(move.getStartPosition()));
                 if (game.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
                     game.addPiece(move.getEndPosition(), new ChessPiece(game.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece()));
                 } else {game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));}
                 game.removePiece(move.getStartPosition());
-                System.out.println(game);
             } else {throw new chess.InvalidMoveException("INVALID");}
         } catch (NullPointerException n) {
             throw new chess.InvalidMoveException("INVALID");
@@ -191,7 +188,12 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
+        for (ChessPosition pos : teamPositions) {
+            if (validMoves(pos) != null)
+                return false;
+            }
+        return true;
     }
 
     /**
@@ -202,7 +204,14 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (!isInCheck(teamColor) & !isInCheckmate(teamColor)) {
+            Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
+            for (ChessPosition pos : teamPositions) {
+                if (validMoves(pos) != null)
+                    return false;
+            }
+        }
+        return true;
     }
 
     /**
