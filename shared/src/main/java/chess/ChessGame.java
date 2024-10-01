@@ -50,6 +50,15 @@ public class ChessGame {
     }
 
     /**
+     * @return Which team's turn it is
+     */
+    public TeamColor getNextTeamColor(TeamColor teamColor) {
+        if (teamColor == TeamColor.BLACK)
+            return TeamColor.WHITE;
+        return TeamColor.BLACK;
+    }
+
+    /**
      * Set's which teams turn it is
      *
      * @param team the team whose turn it is
@@ -125,11 +134,17 @@ public class ChessGame {
                 }
             }
             if (good_move) {
-                if (game.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
+                if (game.getPiece(move.getStartPosition()).getTeamColor() != currentTeamTurn) {
+                    throw new chess.InvalidMoveException("INVALID");
+                }
+                else if (game.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
                     game.addPiece(move.getEndPosition(), new ChessPiece(game.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece()));
-                } else {game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));}
+                }
+                else {game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));}
                 game.removePiece(move.getStartPosition());
-            } else {throw new chess.InvalidMoveException("INVALID");}
+                currentTeamTurn = getNextTeamColor(currentTeamTurn);
+            }
+            else {throw new chess.InvalidMoveException("INVALID");}
         } catch (NullPointerException n) {
             throw new chess.InvalidMoveException("INVALID");
         }
@@ -156,10 +171,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
-        TeamColor enemyColor = TeamColor.BLACK;
-        //switch the enemy kings colors based on the teamColor
-        if (teamColor == TeamColor.BLACK)
-            enemyColor = TeamColor.WHITE;
+        TeamColor enemyColor = getNextTeamColor(teamColor);
         ChessPosition kingPosition = new ChessPosition(0, 0);
         //Find the kings position for the teamColor
         for (ChessPosition pos : teamPositions) {
