@@ -216,13 +216,14 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (!isInCheck(teamColor) & !isInCheckmate(teamColor)) {
+            System.out.println("hit");
             Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
             for (ChessPosition pos : teamPositions) {
                 if (validMoves(pos) != null)
                     return false;
             }
         }
-        return true;
+        return !isInCheckmate(teamColor);
     }
 
     /**
