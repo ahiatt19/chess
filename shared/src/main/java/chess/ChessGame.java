@@ -17,7 +17,6 @@ public class ChessGame {
     public ChessGame() {
         game = new ChessBoard();
         game.resetBoard();
-        //System.out.println(game);
         currentTeamTurn = TeamColor.WHITE;
     }
 
@@ -198,6 +197,8 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        if (!isInCheck(teamColor))
+            return false;
         Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
         for (ChessPosition pos : teamPositions) {
             Collection<ChessMove> moves = validMoves(pos);
@@ -216,10 +217,9 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (!isInCheck(teamColor) & !isInCheckmate(teamColor)) {
-            System.out.println("hit");
             Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
             for (ChessPosition pos : teamPositions) {
-                if (validMoves(pos) != null)
+                for (ChessMove m : validMoves(pos))
                     return false;
             }
         }
@@ -232,7 +232,6 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        //System.out.println(board);
         game = board;
     }
 
