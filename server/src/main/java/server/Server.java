@@ -19,12 +19,19 @@ public class Server {
     }
 
     private static void endPoints() {
+        //Register a user
         Spark.post("/user", (req, res) -> "Register a user");
+        //Log in a user
         Spark.post("/session", (req, res) -> "Log in a user");
+        //Logs out an authenticated user
         Spark.delete("/session", (req, res) -> "Logs out an authenticated user");
+        //Lists all the games
         Spark.get("/game", (req, res) -> "Lists all the games");
+        //Create a new Chess Game
         Spark.post("/game", (req, res) -> "Create a new Chess Game");
+        //Join a Chess Game
         Spark.put("/game", (req, res) -> "Join a Chess Game");
+        //Clear ALL data from the database
         Spark.delete("/db", (req, res) -> "Clear ALL data from the database");
     }
 
