@@ -1,26 +1,24 @@
 package server;
 
+import dataaccess.DataAccessException;
+import dataaccess.MemoryGameDAO;
 import spark.*;
+import service.UserService;
+import dataaccess.MemoryGameDAO;
 
 public class Server {
+
+    MemoryGameDAO memory = new MemoryGameDAO();
+    UserService service = new UserService(memory, memory);
+    RegisterHandler registerHandler = new RegisterHandler(service);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
 
-        // Register your endpoints and handle exceptions here.
-        endPoints();
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
-
-        Spark.awaitInitialization();
-        return Spark.port();
-    }
-
-    private static void endPoints() {
-        //Register a user
-        Spark.post("/user", (req, res) -> "Register a user");
+        // Register a user
+        Spark.post("/user", (req, res) -> registerHandler.handleRequest(req, res));
         //Log in a user
         Spark.post("/session", (req, res) -> "Log in a user");
         //Logs out an authenticated user
@@ -33,10 +31,19 @@ public class Server {
         Spark.put("/game", (req, res) -> "Join a Chess Game");
         //Clear ALL data from the database
         Spark.delete("/db", (req, res) -> "Clear ALL data from the database");
+
+        //This line initializes the server and can be removed once you have a functioning endpoint 
+        //Spark.init();
+
+        //Spark.awaitInitialization();
+        return Spark.port();
     }
 
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
     }
+
+
+
 }

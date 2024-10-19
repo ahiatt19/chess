@@ -1,4 +1,12 @@
 package dataaccess;
 
-public class AuthDAO {
+import model.AuthData;
+
+
+public interface AuthDAO {
+    void createAuth(AuthData a) throws DataAccessException;
+
+    AuthData getAuth(String username) throws DataAccessException;
 }
+
+
