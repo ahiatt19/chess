@@ -1,6 +1,7 @@
-package server;
+package server.Login;
 
 import dataaccess.DataAccessException;
+import server.ErrorResponse;
 import server.Register.RegisterRequest;
 import server.Register.RegisterResult;
 import spark.Request;
@@ -20,16 +21,13 @@ public class LoginHandler {
     public Object handleRequest (Request req, Response res) throws DataAccessException {
         Gson gson = new Gson();
         try {
-            RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
-            if (Objects.equals(request.getUsername(), "") || Objects.equals(request.getPassword(), "")) {
-                res.status(400); // Bad Request
-                return gson.toJson(new ErrorResponse("Error: bad request"));
-            }
-            RegisterResult result = service.register(request);
+            LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
+
+            LoginResult result = service.login(request);
             System.out.println(result);
             if (result == null) {
-                res.status(403);
-                return gson.toJson(new ErrorResponse("Error: already taken"));
+                res.status(401);
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
             }
             return gson.toJson(result);
         } catch (DataAccessException e) {

@@ -1,4 +1,4 @@
-package server;
+package server.Register;
 
 public class RegisterRequest {
     String username;

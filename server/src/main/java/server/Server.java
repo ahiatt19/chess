@@ -1,16 +1,17 @@
 package server;
 
-import dataaccess.DataAccessException;
 import dataaccess.MemoryGameDAO;
+import server.Login.LoginHandler;
+import server.Register.RegisterHandler;
 import spark.*;
 import service.UserService;
-import dataaccess.MemoryGameDAO;
 
 public class Server {
 
     MemoryGameDAO memory = new MemoryGameDAO();
     UserService service = new UserService(memory, memory);
     RegisterHandler registerHandler = new RegisterHandler(service);
+    LoginHandler loginHandler = new LoginHandler(service);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -20,7 +21,7 @@ public class Server {
         // Register a user
         Spark.post("/user", (req, res) -> registerHandler.handleRequest(req, res));
         //Log in a user
-        Spark.post("/session", (req, res) -> "Log in a user");
+        Spark.post("/session", (req, res) -> loginHandler.handleRequest(req, res));
         //Logs out an authenticated user
         Spark.delete("/session", (req, res) -> "Logs out an authenticated user");
         //Lists all the games
