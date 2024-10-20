@@ -3,15 +3,19 @@ package server;
 import dataaccess.MemoryGameDAO;
 import server.Login.LoginHandler;
 import server.Register.RegisterHandler;
+import server.Logout.LogoutHandler;
+import server.CreateGame.CreateGameHandler;
 import spark.*;
 import service.UserService;
 
 public class Server {
 
     MemoryGameDAO memory = new MemoryGameDAO();
-    UserService service = new UserService(memory, memory);
+    UserService service = new UserService(memory, memory, memory);
     RegisterHandler registerHandler = new RegisterHandler(service);
     LoginHandler loginHandler = new LoginHandler(service);
+    LogoutHandler logoutHandler = new LogoutHandler(service);
+    CreateGameHandler createGameHandler = new CreateGameHandler(service);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -23,11 +27,11 @@ public class Server {
         //Log in a user
         Spark.post("/session", (req, res) -> loginHandler.handleRequest(req, res));
         //Logs out an authenticated user
-        Spark.delete("/session", (req, res) -> "Logs out an authenticated user");
+        Spark.delete("/session", (req, res) -> logoutHandler.handleRequest(req, res));
         //Lists all the games
         Spark.get("/game", (req, res) -> "Lists all the games");
         //Create a new Chess Game
-        Spark.post("/game", (req, res) -> "Create a new Chess Game");
+        Spark.post("/game", (req, res) -> createGameHandler.handleRequest(req, res));
         //Join a Chess Game
         Spark.put("/game", (req, res) -> "Join a Chess Game");
         //Clear ALL data from the database
