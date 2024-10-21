@@ -4,6 +4,7 @@ import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,5 +56,32 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
         GameData gameData = new GameData(nextGameID++, null, null, gameName, new ChessGame());
         currentGames.add(gameData);
         return gameData;
+    }
+
+    public ArrayList<GameData> listGames() {
+        return currentGames;
+    }
+
+    public GameData getGame(int gameID) {
+        int i = 0;
+        GameData gameData = null;
+        while (i < currentGames.size()) {
+            if (Objects.equals(currentGames.get(i).gameID(), gameID)) {
+                gameData = currentGames.get(i);
+            }
+            i++;
+        }
+        return gameData;
+    }
+
+    public void updateGame(GameData gameData) {
+        int i = 0;
+        while (i < currentGames.size()) {
+            if (Objects.equals(currentGames.get(i).gameID(), gameData.gameID())) {
+                currentGames.set(i, gameData);
+            }
+            i++;
+        }
+
     }
 }

@@ -4,6 +4,8 @@ import model.UserData;
 import model.AuthData;
 import model.GameData;
 import server.CreateGame.CreateGameResult;
+import server.JoinGame.JoinGameRequest;
+import server.ListGames.ListGamesResult;
 import server.Register.RegisterResult;
 import server.Register.RegisterRequest;
 import server.Login.LoginResult;
@@ -39,7 +41,6 @@ public class UserService {
                 authDataAccess.createAuth(auth);
                 return new RegisterResult(auth);
             } else {
-                //System.out.println("USERNAME ALREADY EXISTS");
                 return null;
             }
         } catch (DataAccessException e) {
@@ -64,31 +65,59 @@ public class UserService {
     }
 
     public String logout(String authToken) throws DataAccessException {
-        try {
-            AuthData authData = authDataAccess.getAuth(authToken);
-            if (authData != null) {
-                authDataAccess.deleteAuth(authData.username());
-                return "";
-            } else {
-                return "401";
-            }
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Failed to register user");
+        AuthData authData = authDataAccess.getAuth(authToken);
+        if (authData != null) {
+            authDataAccess.deleteAuth(authData.username());
+            return "";
+        } else {
+            return "401";
         }
     }
 
     public CreateGameResult createGame(String gameName, String authToken) throws DataAccessException {
-        try {
-            AuthData authData = authDataAccess.getAuth(authToken);
-            System.out.println("The auth Data: " + authData);
-            if (authData != null) {
+        AuthData authData = authDataAccess.getAuth(authToken);
+        System.out.println("The auth Data: " + authData);
+        if (authData != null) {
 
-                GameData gameData = gameDataAccess.createGame(gameName);
-                return new CreateGameResult(gameData.gameID());
-            }
+            GameData gameData = gameDataAccess.createGame(gameName);
+            return new CreateGameResult(gameData.gameID());
+        } else {
             return null;
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Failed to register user");
         }
+    }
+
+    public ListGamesResult listGames(String authToken) throws DataAccessException {
+        AuthData authData = authDataAccess.getAuth(authToken);
+        System.out.println("The auth Data: " + authData);
+        if (authData != null) {
+            return new ListGamesResult(gameDataAccess.listGames());
+        }
+        return null;
+    }
+
+    public String joinGame(String authToken, JoinGameRequest joinGameRequest) throws DataAccessException {
+        AuthData authData = authDataAccess.getAuth(authToken);
+        System.out.println("The auth Data: " + authData);
+        if (authData != null) {
+            GameData gameData = gameDataAccess.getGame(joinGameRequest.getGameID());
+
+            if (gameData != null && Objects.equals(joinGameRequest.getPlayerColor(), "WHITE")) {
+                if (gameData.whiteUsername() != null) {
+                    return "403";
+                }
+                GameData updatedGameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName(), gameData.game());
+                gameDataAccess.updateGame(updatedGameData);
+                return null;
+            } else if (gameData != null && Objects.equals(joinGameRequest.getPlayerColor(), "BLACK")) {
+                if (gameData.blackUsername() != null) {
+                    return "403";
+                }
+                GameData updatedGameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName(), gameData.game());
+                gameDataAccess.updateGame(updatedGameData);
+                return null;
+            }
+            return "400";
+        }
+        return "401";
     }
 }

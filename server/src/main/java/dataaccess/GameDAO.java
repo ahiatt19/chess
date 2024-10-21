@@ -1,11 +1,19 @@
 package dataaccess;
 
 import model.GameData;
+import server.JoinGame.JoinGameRequest;
+import server.ListGames.ListGamesResult;
+
+import java.util.ArrayList;
 
 public interface GameDAO {
-    GameData createGame(String gameName) throws DataAccessException;
+    GameData createGame(String gameName);
 
-    //UserData getUser(String username) throws DataAccessException;
+    ArrayList<GameData> listGames();
+
+    GameData getGame(int gameID);
+
+    void updateGame(GameData gameData);
 }
 
 
