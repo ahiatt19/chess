@@ -1,4 +1,4 @@
-package server.Register;
+package server.register;
 
 import dataaccess.DataAccessException;
 import server.ErrorResponse;

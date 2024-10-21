@@ -62,9 +62,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        int correct_row = toarrayindex(position.getRow(), 'r');
-        int correct_col = toarrayindex(position.getColumn(), 'c');
-        squares[correct_row][correct_col] = piece;
+        int correctRow = toarrayindex(position.getRow(), 'r');
+        int correctCol = toarrayindex(position.getColumn(), 'c');
+        squares[correctRow][correctCol] = piece;
     }
 
     /**
@@ -75,9 +75,9 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        int correct_row = toarrayindex(position.getRow(), 'r');
-        int correct_col = toarrayindex(position.getColumn(), 'c');
-        return squares[correct_row][correct_col];
+        int correctRow = toarrayindex(position.getRow(), 'r');
+        int correctCol = toarrayindex(position.getColumn(), 'c');
+        return squares[correctRow][correctCol];
     }
 
     public boolean isEmpty(ChessPosition position) {
@@ -85,9 +85,9 @@ public class ChessBoard {
     }
 
     public void removePiece(ChessPosition position) {
-        int correct_row = toarrayindex(position.getRow(), 'r');
-        int correct_col = toarrayindex(position.getColumn(), 'c');
-        squares[correct_row][correct_col] = null;
+        int correctRow = toarrayindex(position.getRow(), 'r');
+        int correctCol = toarrayindex(position.getColumn(), 'c');
+        squares[correctRow][correctCol] = null;
     }
 
     /**

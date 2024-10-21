@@ -2,13 +2,12 @@ package service;
 
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
-import server.CreateGame.CreateGameResult;
-import server.JoinGame.JoinGameRequest;
-import server.ListGames.ListGamesResult;
-import server.Login.LoginRequest;
-import server.Login.LoginResult;
-import server.Register.RegisterRequest;
-import server.Register.RegisterResult;
+import server.creategame.CreateGameResult;
+import server.joingame.JoinGameRequest;
+import server.listgames.ListGamesResult;
+import server.login.LoginRequest;
+import server.register.RegisterRequest;
+import server.register.RegisterResult;
 import dataaccess.MemoryGameDAO;
 
 import org.junit.jupiter.api.Test;

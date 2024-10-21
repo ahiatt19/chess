@@ -3,13 +3,13 @@ import dataaccess.*;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
-import server.CreateGame.CreateGameResult;
-import server.JoinGame.JoinGameRequest;
-import server.ListGames.ListGamesResult;
-import server.Register.RegisterResult;
-import server.Register.RegisterRequest;
-import server.Login.LoginResult;
-import server.Login.LoginRequest;
+import server.creategame.CreateGameResult;
+import server.joingame.JoinGameRequest;
+import server.listgames.ListGamesResult;
+import server.register.RegisterResult;
+import server.register.RegisterRequest;
+import server.login.LoginResult;
+import server.login.LoginRequest;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -20,10 +20,10 @@ public class Service {
     private final AuthDAO authDataAccess;
     private final GameDAO gameDataAccess;
 
-    public Service(MemoryGameDAO DataAccess) {
-        this.userDataAccess = DataAccess;
-        this.authDataAccess = DataAccess;
-        this.gameDataAccess = DataAccess;
+    public Service(MemoryGameDAO dataAccess) {
+        this.userDataAccess = dataAccess;
+        this.authDataAccess = dataAccess;
+        this.gameDataAccess = dataAccess;
     }
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException {

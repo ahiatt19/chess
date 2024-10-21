@@ -1,4 +1,4 @@
-package server.ListGames;
+package server.listgames;
 
 import model.GameData;
 import java.util.ArrayList;

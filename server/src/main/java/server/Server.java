@@ -1,13 +1,13 @@
 package server;
 
 import dataaccess.MemoryGameDAO;
-import server.Clear.ClearHandler;
-import server.Login.LoginHandler;
-import server.Register.RegisterHandler;
-import server.Logout.LogoutHandler;
-import server.CreateGame.CreateGameHandler;
-import server.ListGames.ListGamesHandler;
-import server.JoinGame.JoinGameHandler;
+import server.clear.ClearHandler;
+import server.login.LoginHandler;
+import server.register.RegisterHandler;
+import server.logout.LogoutHandler;
+import server.creategame.CreateGameHandler;
+import server.listgames.ListGamesHandler;
+import server.joingame.JoinGameHandler;
 import spark.*;
 import service.Service;
 

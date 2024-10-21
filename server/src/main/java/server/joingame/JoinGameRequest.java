@@ -1,4 +1,4 @@
-package server.JoinGame;
+package server.joingame;
 
 public class JoinGameRequest {
     String playerColor;

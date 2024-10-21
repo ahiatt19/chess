@@ -1,4 +1,4 @@
-package server.CreateGame;
+package server.creategame;
 
 public class CreateGameRequest {
     String gameName;

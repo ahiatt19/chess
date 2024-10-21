@@ -1,4 +1,4 @@
-package server.JoinGame;
+package server.joingame;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
