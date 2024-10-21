@@ -7,14 +7,13 @@ import model.GameData;
 import model.UserData;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
 
     private ArrayList<UserData> currentUsers = new ArrayList<>();
-    private Map<String, String> usersAuth = new HashMap<>();
+    private ArrayList<AuthData> usersAuth = new ArrayList<>();
     private ArrayList<GameData> currentGames = new ArrayList<>();
     private int nextGameID = 1;
 
@@ -25,7 +24,7 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
 
 
     public void clearAuths() {
-        usersAuth = new HashMap<>();
+        usersAuth = new ArrayList<>();
     }
 
 
@@ -53,20 +52,31 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
 
 
     public void createAuth(AuthData a) {
-        usersAuth.put(a.authToken(), a.username());
+        usersAuth.add(a);
     }
 
 
     public AuthData getAuth(String authToken) {
-        if (!usersAuth.containsKey(authToken))
-            return null;
-        String username = usersAuth.get(authToken);
-        return new AuthData(username, authToken);
+        int i = 0;
+        AuthData authData = null;
+        while (i < usersAuth.size()) {
+            if (Objects.equals(usersAuth.get(i).authToken(), authToken)) {
+                authData = usersAuth.get(i);
+            }
+            i++;
+        }
+        return authData;
     }
 
 
     public void deleteAuth(String authToken) {
-        usersAuth.remove(authToken);
+        int i = 0;
+        while (i < usersAuth.size()) {
+            if (Objects.equals(usersAuth.get(i).authToken(), authToken)) {
+                usersAuth.remove(i);
+            }
+            i++;
+        }
     }
 
 
@@ -103,5 +113,20 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
             }
             i++;
         }
+    }
+
+    //Created for testing
+    public int userSize() {
+        return currentUsers.size();
+    }
+
+    //Created for testing
+    public int gamesSize() {
+        return currentGames.size();
+    }
+
+    //Created for testing
+    public int authSize() {
+        return usersAuth.size();
     }
 }

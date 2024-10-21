@@ -10,5 +10,9 @@ public class ListGamesResult {
         this.games = games;
     }
 
+    public ArrayList<GameData> getGames() {
+        return games;
+    }
+
 
 }

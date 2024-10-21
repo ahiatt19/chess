@@ -25,7 +25,6 @@ public class CreateGameHandler {
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
             CreateGameResult result = service.createGame(request.getGameName(), req.headers("Authorization"));
-            System.out.println(result);
             if (result == null) {
                 res.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));

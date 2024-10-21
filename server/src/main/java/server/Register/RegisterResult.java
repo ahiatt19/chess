@@ -10,4 +10,8 @@ public class RegisterResult {
         this.username = auth.username();
         this.authToken = auth.authToken();
     }
+
+    public String getAuthToken() {
+        return authToken;
+    }
 }
