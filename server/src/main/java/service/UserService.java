@@ -30,37 +30,28 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException {
-        try {
-            UserData userData = new UserData(request.getUsername(), request.getPassword(), request.getEmail());
+        UserData userData = new UserData(request.getUsername(), request.getPassword(), request.getEmail());
 
-            UserData user = userDataAccess.getUser(request.getUsername());
-            if (user == null) {
-                System.out.println("User is null: " + request.getUsername());
-                userDataAccess.createUser(userData);
-                AuthData auth = new AuthData(request.getUsername(), UUID.randomUUID().toString());
-                authDataAccess.createAuth(auth);
-                return new RegisterResult(auth);
-            } else {
-                return null;
-            }
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Failed to register user");
+        UserData user = userDataAccess.getUser(request.getUsername());
+        if (user == null) {
+            System.out.println("User is null: " + request.getUsername());
+            userDataAccess.createUser(userData);
+            AuthData auth = new AuthData(request.getUsername(), UUID.randomUUID().toString());
+            authDataAccess.createAuth(auth);
+            return new RegisterResult(auth);
+        } else {
+            return null;
         }
     }
 
     public LoginResult login(LoginRequest request) throws DataAccessException {
-        try {
-            UserData user = userDataAccess.getUser(request.getUsername());
-            if (Objects.equals(user.password(), request.getPassword())) {
-                AuthData auth = new AuthData(request.getUsername(), UUID.randomUUID().toString());
-                authDataAccess.createAuth(auth);
-                return new LoginResult(auth);
-            } else {
-                return null;
-            }
-        }
-        catch (DataAccessException e) {
-            throw new DataAccessException("Failed to register user");
+        UserData user = userDataAccess.getUser(request.getUsername());
+        if (Objects.equals(user.password(), request.getPassword())) {
+            AuthData auth = new AuthData(request.getUsername(), UUID.randomUUID().toString());
+            authDataAccess.createAuth(auth);
+            return new LoginResult(auth);
+        } else {
+            return null;
         }
     }
 
@@ -119,5 +110,11 @@ public class UserService {
             return "400";
         }
         return "401";
+    }
+
+    public void clear() throws DataAccessException {
+        authDataAccess.clearAuths();
+        userDataAccess.clearUsers();
+        gameDataAccess.clearGames();
     }
 }

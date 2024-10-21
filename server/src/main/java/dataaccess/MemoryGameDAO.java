@@ -13,10 +13,23 @@ import java.util.Objects;
 
 public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
 
-    final private ArrayList<UserData> currentUsers = new ArrayList<>();
-    final private Map<String, String> usersAuth = new HashMap<>();
-    final private ArrayList<GameData> currentGames = new ArrayList<>();
+    private ArrayList<UserData> currentUsers = new ArrayList<>();
+    private Map<String, String> usersAuth = new HashMap<>();
+    private ArrayList<GameData> currentGames = new ArrayList<>();
     private int nextGameID = 1;
+
+
+    public void clearUsers() {
+        currentUsers = new ArrayList<>();
+    }
+
+    public void clearAuths() {
+        usersAuth = new HashMap<>();
+    }
+
+    public void clearGames() {
+        currentGames = new ArrayList<>();
+    }
 
     //to create/register user
     public void createUser(UserData u) {
@@ -36,6 +49,7 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
         System.out.println("This is user: " + user);
         return user;
     }
+
 
     public void createAuth(AuthData a) {
         usersAuth.put(a.authToken(), a.username());

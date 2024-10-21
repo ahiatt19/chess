@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.MemoryGameDAO;
+import server.Clear.ClearHandler;
 import server.Login.LoginHandler;
 import server.Register.RegisterHandler;
 import server.Logout.LogoutHandler;
@@ -20,6 +21,7 @@ public class Server {
     CreateGameHandler createGameHandler = new CreateGameHandler(service);
     ListGamesHandler listGamesHandler = new ListGamesHandler(service);
     JoinGameHandler joinGameHandler = new JoinGameHandler(service);
+    ClearHandler clearHandler = new ClearHandler(service);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -39,7 +41,7 @@ public class Server {
         //Join a Chess Game
         Spark.put("/game", (req, res) -> joinGameHandler.handleRequest(req, res));
         //Clear ALL data from the database
-        Spark.delete("/db", (req, res) -> "Clear ALL data from the database");
+        Spark.delete("/db", (req, res) -> clearHandler.handleRequest(req, res));
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         //Spark.init();

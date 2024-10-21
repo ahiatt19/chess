@@ -14,6 +14,8 @@ public interface GameDAO {
     GameData getGame(int gameID);
 
     void updateGame(GameData gameData);
+
+    void clearGames();
 }
 
 
