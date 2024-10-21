@@ -140,7 +140,8 @@ public class ChessGame {
                     throw new chess.InvalidMoveException("INVALID");
                 }
                 else if (game.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
-                    game.addPiece(move.getEndPosition(), new ChessPiece(game.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece()));
+                    game.addPiece(move.getEndPosition(),
+                            new ChessPiece(game.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece()));
                 }
                 else {game.addPiece(move.getEndPosition(), game.getPiece(move.getStartPosition()));}
                 game.removePiece(move.getStartPosition());
