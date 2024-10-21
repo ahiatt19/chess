@@ -2,6 +2,8 @@ package service;
 
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
+import server.CreateGame.CreateGameResult;
+import server.JoinGame.JoinGameRequest;
 import server.ListGames.ListGamesResult;
 import server.Login.LoginRequest;
 import server.Login.LoginResult;
@@ -61,8 +63,7 @@ public class ServiceTests {
     @DisplayName("Login User +")
     public void loginUser() throws DataAccessException {
         //Create the User Request and create a user
-        RegisterRequest goodRequest = new RegisterRequest("GoodUser", "pass", "email");
-        service.register(goodRequest);
+        RegisterResult regResult = service.register(new RegisterRequest("GoodUser", "pass", "email"));
 
         service.login(new LoginRequest("GoodUser", "pass"));
 
@@ -79,8 +80,7 @@ public class ServiceTests {
     @DisplayName("Login User -")
     public void loginBadUser() throws DataAccessException {
         //Create the User Request and create a user
-        RegisterRequest goodRequest = new RegisterRequest("GoodUser", "pass", "email");
-        service.register(goodRequest);
+        RegisterResult regResult = service.register(new RegisterRequest("GoodUser", "pass", "email"));
 
         //Login user with wrong password
         service.login(new LoginRequest("GoodUser", "wrong pass"));
@@ -95,9 +95,7 @@ public class ServiceTests {
     @DisplayName("Logout User +")
     public void logoutUser() throws DataAccessException {
         //Create the User Request and create a user
-        RegisterRequest goodRequest = new RegisterRequest("GoodUser", "pass", "email");
-        //Register and log in the user
-        RegisterResult regResult = service.register(goodRequest);
+        RegisterResult regResult = service.register(new RegisterRequest("GoodUser", "pass", "email"));
 
         //User in memory is the same User
         Assertions.assertEquals("GoodUser", memory.getUser("GoodUser").username());
@@ -121,8 +119,7 @@ public class ServiceTests {
     @Order(6)
     @DisplayName("Logout User -")
     public void logoutBadUser() throws DataAccessException {
-        RegisterRequest goodRequest = new RegisterRequest("GoodUser", "pass", "email");
-        RegisterResult regResult = service.register(goodRequest);
+        RegisterResult regResult = service.register(new RegisterRequest("GoodUser", "pass", "email"));
 
         //Still only one user in memory
         Assertions.assertEquals(1, memory.userSize());
@@ -143,8 +140,7 @@ public class ServiceTests {
     @Order(7)
     @DisplayName("Create Game +")
     public void createGameTest() throws DataAccessException {
-        RegisterRequest goodRequest = new RegisterRequest("GoodUser", "pass", "email");
-        RegisterResult regResult = service.register(goodRequest);
+        RegisterResult regResult = service.register(new RegisterRequest("GoodUser", "pass", "email"));
 
         //create game with auth token
         service.createGame("Game400", regResult.getAuthToken());
@@ -167,10 +163,9 @@ public class ServiceTests {
 
     @Test
     @Order(9)
-    @DisplayName("Create Game +")
+    @DisplayName("List Games +")
     public void listGamesTest() throws DataAccessException {
-        RegisterRequest goodRequest = new RegisterRequest("GoodUser", "pass", "email");
-        RegisterResult regResult = service.register(goodRequest);
+        RegisterResult regResult = service.register(new RegisterRequest("GoodUser", "pass", "email"));
 
         //Create 3 games
         service.createGame("Game400", regResult.getAuthToken());
@@ -181,5 +176,100 @@ public class ServiceTests {
 
         //Still only one user in memory
         Assertions.assertEquals(3, listGames.getGames().size());
+    }
+
+
+    @Test
+    @Order(10)
+    @DisplayName("List Games -")
+    public void listGamesBadTest() throws DataAccessException {
+        RegisterResult regResult = service.register(new RegisterRequest("GoodUser", "pass", "email"));
+
+        //Create 3 games
+        service.createGame("Game400", regResult.getAuthToken());
+        service.createGame("Game6700", regResult.getAuthToken());
+        service.createGame("Woah!", regResult.getAuthToken());
+
+        ListGamesResult listGames = service.listGames("this-is-not-the-auth-token");
+
+        //Because the authToken was incorrect, it returns null
+        Assertions.assertEquals(null, listGames);
+    }
+
+
+    @Test
+    @Order(11)
+    @DisplayName("Update Game +")
+    public void updateGameTest() throws DataAccessException {
+        RegisterResult regResult1 = service.register(new RegisterRequest("FirstUser", "pass", "email"));
+        RegisterResult regResult2 = service.register(new RegisterRequest("OtherUser67", "6767", "email"));
+
+        //Create a game
+        CreateGameResult createGameResult = service.createGame("FirstGameWHAT!!", regResult1.getAuthToken());
+
+        //join game requests
+        JoinGameRequest joinGameRequest1 = new JoinGameRequest("WHITE", createGameResult.getGameID());
+        JoinGameRequest joinGameRequest2 = new JoinGameRequest("BLACK", createGameResult.getGameID());
+
+        //add users to game
+        service.updateGame(regResult1.getAuthToken(), joinGameRequest1);
+        service.updateGame(regResult2.getAuthToken(), joinGameRequest2);
+
+        //Check that the users are correctly in memory in the game Data
+        Assertions.assertEquals("OtherUser67", memory.getGame(createGameResult.getGameID()).blackUsername());
+        Assertions.assertEquals("FirstUser", memory.getGame(createGameResult.getGameID()).whiteUsername());
+    }
+
+
+    @Test
+    @Order(12)
+    @DisplayName("Update Game -")
+    public void updateBadGameTest() throws DataAccessException {
+        RegisterResult regResult1 = service.register(new RegisterRequest("FirstUser", "pass", "email"));
+        RegisterResult regResult2 = service.register(new RegisterRequest("OtherUser67", "6767", "email"));
+
+        //Create a game
+        CreateGameResult createGameResult = service.createGame("FirstGameWHAT!!", regResult1.getAuthToken());
+
+        //join game requests
+        JoinGameRequest joinGameRequest1 = new JoinGameRequest("WHITE", createGameResult.getGameID());
+        JoinGameRequest joinGameRequest2 = new JoinGameRequest("WHITE", createGameResult.getGameID());
+
+        //add users to game
+        service.updateGame(regResult1.getAuthToken(), joinGameRequest1);
+        service.updateGame(regResult2.getAuthToken(), joinGameRequest2);
+
+        //Check that only First User is white and black is null
+        Assertions.assertNotEquals("OtherUser67", memory.getGame(createGameResult.getGameID()).whiteUsername());
+        Assertions.assertEquals("FirstUser", memory.getGame(createGameResult.getGameID()).whiteUsername());
+        Assertions.assertEquals(null, memory.getGame(createGameResult.getGameID()).blackUsername());
+    }
+
+
+    @Test
+    @Order(13)
+    @DisplayName("Clear +")
+    public void clearTest() throws DataAccessException {
+        //Register 2 users
+        RegisterResult regResult = service.register(new RegisterRequest("User1", "pass", "email"));
+        service.register(new RegisterRequest("User2", "pass", "email"));
+
+        //Create 3 games
+        service.createGame("Game400", regResult.getAuthToken());
+        service.createGame("Game6700", regResult.getAuthToken());
+        service.createGame("Woah!", regResult.getAuthToken());
+
+        //show they were filled before clear
+        Assertions.assertEquals(3, memory.gamesSize());
+        Assertions.assertEquals(2, memory.userSize());
+        Assertions.assertEquals(2, memory.authSize());
+
+        //Create 3 games
+        service.clear();
+
+        //all should be size 0
+        Assertions.assertEquals(0, memory.gamesSize());
+        Assertions.assertEquals(0, memory.userSize());
+        Assertions.assertEquals(0, memory.authSize());
     }
 }
