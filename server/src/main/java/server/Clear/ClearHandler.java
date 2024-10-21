@@ -21,7 +21,7 @@ public class ClearHandler {
         Gson gson = new Gson();
         try {
             service.clear();
-            return gson.toJson("");
+            return gson.toJson(new Object());
         } catch (DataAccessException e) {
             res.status(500);
             return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));

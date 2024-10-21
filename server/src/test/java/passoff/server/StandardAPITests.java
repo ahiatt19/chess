@@ -59,6 +59,7 @@ public class StandardAPITests {
     @DisplayName("Static Files")
     public void staticFiles() throws Exception {
         String htmlFromServer = serverFacade.file("/").replaceAll("\r", "");
+        System.out.println(htmlFromServer);
         Assertions.assertEquals(HttpURLConnection.HTTP_OK, serverFacade.getStatusCode(),
                 "Server response code was not 200 OK");
         Assertions.assertNotNull(htmlFromServer, "Server returned an empty file");
