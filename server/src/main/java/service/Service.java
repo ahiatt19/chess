@@ -89,14 +89,16 @@ public class Service {
                 if (gameData.whiteUsername() != null) {
                     return "403";
                 }
-                GameData updatedGameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName(), gameData.game());
+                GameData updatedGameData = new GameData(gameData.gameID(), authData.username(),
+                        gameData.blackUsername(), gameData.gameName(), gameData.game());
                 gameDataAccess.updateGame(updatedGameData);
                 return null;
             } else if (gameData != null && Objects.equals(joinGameRequest.getPlayerColor(), "BLACK")) {
                 if (gameData.blackUsername() != null) {
                     return "403";
                 }
-                GameData updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), authData.username(), gameData.gameName(), gameData.game());
+                GameData updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(),
+                        authData.username(), gameData.gameName(), gameData.game());
                 gameDataAccess.updateGame(updatedGameData);
                 return null;
             }

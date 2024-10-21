@@ -203,8 +203,8 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor))
-            return false;
+        if (!isInCheck(teamColor)) {
+            return false;}
         Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
         for (ChessPosition pos : teamPositions) {
             Collection<ChessMove> moves = validMoves(pos);

@@ -27,8 +27,8 @@ public class ChessPiece {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
 
         ChessPiece that = (ChessPiece) o;
         return pieceColor == that.pieceColor && type == that.type;
@@ -43,33 +43,33 @@ public class ChessPiece {
 
     public String getColorPiece() {
         if (getPieceType() == PieceType.KNIGHT) {
-            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
-                    return "n";
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                    return "n";}
             return "N";
         }
         if (getPieceType() == PieceType.PAWN) {
-            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
-                return "p";
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                return "p";}
             return "P";
         }
         if (getPieceType() == PieceType.KING) {
-            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
-                return "k";
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                return "k";}
             return "K";
         }
         if (getPieceType() == PieceType.QUEEN) {
-            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
-                return "q";
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                return "q";}
             return "Q";
         }
         if (getPieceType() == PieceType.BISHOP) {
-            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
-                return "b";
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                return "b";}
             return "B";
         }
         if (getPieceType() == PieceType.ROOK) {
-            if (pieceColor.equals(ChessGame.TeamColor.BLACK))
-                return "r";
+            if (pieceColor.equals(ChessGame.TeamColor.BLACK)) {
+                return "r";}
             return "R";
         }
         return " ";
@@ -241,7 +241,7 @@ public class ChessPiece {
             //System.out.println("INVALID");
             moves.add(new ChessMove(myPosition, new ChessPosition(r, c), null));
             return true;
-        } else return board.getPiece(new ChessPosition(r, c)).pieceColor == pieceColor;
+        } else {return board.getPiece(new ChessPosition(r, c)).pieceColor == pieceColor;}
         return false;
     }
 }

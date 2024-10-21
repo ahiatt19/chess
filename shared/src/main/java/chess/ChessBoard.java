@@ -16,8 +16,8 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         ChessBoard that = (ChessBoard) o;
         return Arrays.deepEquals(squares, that.squares);
     }
@@ -48,10 +48,10 @@ public class ChessBoard {
     }
 
     public int toarrayindex(int index, char kind) {
-        if (kind == 'r')
-            return 8 - index;
-        if (kind == 'c')
-            return index - 1;
+        if (kind == 'r') {
+            return 8 - index;}
+        if (kind == 'c') {
+            return index - 1;}
         return -225;
     }
 
@@ -97,8 +97,8 @@ public class ChessBoard {
     public void resetBoard() {
         //WHITE PIECES
         ChessPiece whitepawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        for (int c = 1; c < 9; c++)
-            addPiece(new ChessPosition(2, c), whitepawn);
+        for (int c = 1; c < 9; c++){
+            addPiece(new ChessPosition(2, c), whitepawn);}
         ChessPiece whiterook = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
         addPiece(new ChessPosition(1, 1), whiterook);
         addPiece(new ChessPosition(1, 8), whiterook);
@@ -112,8 +112,8 @@ public class ChessBoard {
         addPiece(new ChessPosition(1, 5), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
         ChessPiece blackpawn = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
         //BLACK PIECES
-        for (int c = 1; c < 9; c++)
-            addPiece(new ChessPosition(7, c), blackpawn);
+        for (int c = 1; c < 9; c++){
+            addPiece(new ChessPosition(7, c), blackpawn);}
         ChessPiece blackrook = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
         addPiece(new ChessPosition(8, 1), blackrook);
         addPiece(new ChessPosition(8, 8), blackrook);
