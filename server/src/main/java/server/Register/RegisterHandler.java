@@ -19,12 +19,13 @@ public class RegisterHandler {
         Gson gson = new Gson();
         try {
             RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
+            //Username or password are null
             if (request.getUsername() == null || request.getPassword() == null) {
                 res.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
             RegisterResult result = service.register(request);
-
+            //username is already taken
             if (result == null) {
                 res.status(403);
                 return gson.toJson(new ErrorResponse("Error: already taken"));

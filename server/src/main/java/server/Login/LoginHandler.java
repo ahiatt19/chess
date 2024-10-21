@@ -21,6 +21,7 @@ public class LoginHandler {
             LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
 
             LoginResult result = service.login(request);
+            //bad auth token
             if (result == null) {
                 res.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));

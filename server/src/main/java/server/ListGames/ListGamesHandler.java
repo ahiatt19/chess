@@ -19,6 +19,7 @@ public class ListGamesHandler {
         Gson gson = new Gson();
         try {
             ListGamesResult result = service.listGames(req.headers("Authorization"));
+            //bad auth token
             if (result == null) {
                 res.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));

@@ -20,15 +20,19 @@ public class JoinGameHandler {
         Gson gson = new Gson();
         try {
             JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
+            //My service updateGame function returns strings that I compare for the response
             String result = service.updateGame(req.headers("Authorization"), request);
+            //bad request
             if (Objects.equals(result, "400")) {
                 res.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
+            //not correct auth token
             if (Objects.equals(result, "401")) {
                 res.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));
             }
+            //someone is already in that color and game
             if (Objects.equals(result, "403")) {
                 res.status(403);
                 return gson.toJson(new ErrorResponse("Error: already taken"));

@@ -43,18 +43,11 @@ public class Server {
         //Clear ALL data from the database
         Spark.delete("/db", (req, res) -> clearHandler.handleRequest(req, res));
 
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-        //Spark.init();
-
         Spark.awaitInitialization();
         return Spark.port();
     }
 
     public void stop() {
         Spark.stop();
-        //Spark.awaitStop();
     }
-
-
-
 }

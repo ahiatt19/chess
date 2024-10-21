@@ -28,7 +28,6 @@ public class Service {
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException {
         UserData userData = new UserData(request.getUsername(), request.getPassword(), request.getEmail());
-
         UserData user = userDataAccess.getUser(request.getUsername());
         if (user == null) {
             userDataAccess.createUser(userData);
@@ -67,7 +66,6 @@ public class Service {
     public CreateGameResult createGame(String gameName, String authToken) throws DataAccessException {
         AuthData authData = authDataAccess.getAuth(authToken);
         if (authData != null) {
-
             GameData gameData = gameDataAccess.createGame(gameName);
             return new CreateGameResult(gameData.gameID());
         } else {

@@ -6,7 +6,6 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Objects;
 

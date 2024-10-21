@@ -20,11 +20,13 @@ public class CreateGameHandler {
         Gson gson = new Gson();
         try {
             CreateGameRequest request = gson.fromJson(req.body(), CreateGameRequest.class);
+            //If gameName is null bad request
             if (Objects.equals(request.getGameName(), "")) {
                 res.status(400); // Bad Request
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
             CreateGameResult result = service.createGame(request.getGameName(), req.headers("Authorization"));
+            //Auth token is not valid
             if (result == null) {
                 res.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));

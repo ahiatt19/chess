@@ -21,6 +21,7 @@ public class LogoutHandler {
         Gson gson = new Gson();
         try {
             String result = service.logout(req.headers("Authorization"));
+            //bad auth token
             if (Objects.equals(result, "401")) {
                 res.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));
