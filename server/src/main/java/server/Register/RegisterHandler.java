@@ -20,7 +20,7 @@ public class RegisterHandler {
         Gson gson = new Gson();
         try {
             RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
-            if (Objects.equals(request.getUsername(), "") || Objects.equals(request.getPassword(), "")) {
+            if (request.getUsername() == null || request.getPassword() == null) {
                 res.status(400); // Bad Request
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }

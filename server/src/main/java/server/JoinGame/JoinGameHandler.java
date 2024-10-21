@@ -3,8 +3,6 @@ package server.JoinGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import server.ErrorResponse;
-import server.ListGames.ListGamesResult;
-import server.Register.RegisterRequest;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -21,8 +19,9 @@ public class JoinGameHandler {
     public Object handleRequest (Request req, Response res) throws DataAccessException {
         Gson gson = new Gson();
         try {
+            System.out.println("hitting in here");
             JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
-            String result = service.joinGame(req.headers("Authorization"), request);
+            String result = service.updateGame(req.headers("Authorization"), request);
             if (Objects.equals(result, "400")) {
                 res.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
@@ -35,7 +34,7 @@ public class JoinGameHandler {
                 res.status(403);
                 return gson.toJson(new ErrorResponse("Error: already taken"));
             }
-            return gson.toJson(result);
+            return gson.toJson(new Object());
         } catch (DataAccessException e) {
             res.status(500);
             return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));

@@ -4,9 +4,11 @@ import model.GameData;
 import java.util.ArrayList;
 
 public class ListGamesResult {
-    ArrayList<GameData> gameDataList = new ArrayList<>();
+    ArrayList<GameData> games;
 
-    public ListGamesResult (ArrayList<GameData> gameDataList) {
-        this.gameDataList = gameDataList;
+    public ListGamesResult (ArrayList<GameData> games) {
+        this.games = games;
     }
+
+
 }
