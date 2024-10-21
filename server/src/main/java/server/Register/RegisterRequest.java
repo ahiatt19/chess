@@ -5,9 +5,7 @@ public class RegisterRequest {
     String password;
     String email;
 
-    public String getUsername() {
-        return this.username;
-    }
+    public String getUsername() { return this.username; }
 
     public String getPassword() {
         return this.password;

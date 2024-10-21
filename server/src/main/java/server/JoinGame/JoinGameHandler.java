@@ -3,23 +3,22 @@ package server.JoinGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import server.ErrorResponse;
-import service.UserService;
+import service.Service;
 import spark.Request;
 import spark.Response;
 
 import java.util.Objects;
 
 public class JoinGameHandler {
-    private final UserService service;
+    private final Service service;
 
-    public JoinGameHandler(UserService service) {
+    public JoinGameHandler(Service service) {
         this.service = service;
     }
 
-    public Object handleRequest (Request req, Response res) throws DataAccessException {
+    public Object handleRequest (Request req, Response res) {
         Gson gson = new Gson();
         try {
-            System.out.println("hitting in here");
             JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
             String result = service.updateGame(req.headers("Authorization"), request);
             if (Objects.equals(result, "400")) {

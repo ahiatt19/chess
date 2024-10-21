@@ -3,20 +3,20 @@ package server.CreateGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import server.ErrorResponse;
-import service.UserService;
+import service.Service;
 import spark.Request;
 import spark.Response;
 
 import java.util.Objects;
 
 public class CreateGameHandler {
-    private final UserService service;
+    private final Service service;
 
-    public CreateGameHandler(UserService service) {
+    public CreateGameHandler(Service service) {
         this.service = service;
     }
 
-    public Object handleRequest (Request req, Response res) throws DataAccessException {
+    public Object handleRequest (Request req, Response res) {
         Gson gson = new Gson();
         try {
             CreateGameRequest request = gson.fromJson(req.body(), CreateGameRequest.class);

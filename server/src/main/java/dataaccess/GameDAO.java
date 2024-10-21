@@ -1,8 +1,6 @@
 package dataaccess;
 
 import model.GameData;
-import server.JoinGame.JoinGameRequest;
-import server.ListGames.ListGamesResult;
 
 import java.util.ArrayList;
 

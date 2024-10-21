@@ -1,24 +1,23 @@
 package server.Logout;
 
 import dataaccess.DataAccessException;
-import server.ListGames.ListGamesResult;
 import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
-import service.UserService;
+import service.Service;
 import server.ErrorResponse;
 
 import java.util.Objects;
 
 
 public class LogoutHandler {
-    private final UserService service;
+    private final Service service;
 
-    public LogoutHandler(UserService service) {
+    public LogoutHandler(Service service) {
         this.service = service;
     }
 
-    public Object handleRequest (Request req, Response res) throws DataAccessException {
+    public Object handleRequest (Request req, Response res) {
         Gson gson = new Gson();
         try {
             String result = service.logout(req.headers("Authorization"));

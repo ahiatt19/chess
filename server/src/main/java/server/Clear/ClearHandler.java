@@ -3,21 +3,19 @@ package server.Clear;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import server.ErrorResponse;
-import server.JoinGame.JoinGameRequest;
-import service.UserService;
+import service.Service;
 import spark.Request;
 import spark.Response;
 
-import java.util.Objects;
 
 public class ClearHandler {
-    private final UserService service;
+    private final Service service;
 
-    public ClearHandler(UserService service) {
+    public ClearHandler(Service service) {
         this.service = service;
     }
 
-    public Object handleRequest (Request req, Response res) throws DataAccessException {
+    public Object handleRequest (Request req, Response res) {
         Gson gson = new Gson();
         try {
             service.clear();

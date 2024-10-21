@@ -1,13 +1,13 @@
 package dataaccess;
 
 import chess.ChessGame;
+
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -23,30 +23,31 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
         currentUsers = new ArrayList<>();
     }
 
+
     public void clearAuths() {
         usersAuth = new HashMap<>();
     }
+
 
     public void clearGames() {
         currentGames = new ArrayList<>();
     }
 
-    //to create/register user
+
     public void createUser(UserData u) {
         currentUsers.add(u);
     }
+
 
     public UserData getUser(String username) {
         int i = 0;
         UserData user = null;
         while (i < currentUsers.size()) {
-            //System.out.println("List username: " + currentUsers.get(i).username() + " our username: " + username);
             if (Objects.equals(currentUsers.get(i).username(), username)) {
                 user = currentUsers.get(i);
             }
             i++;
         }
-        //System.out.println("This is user: " + user);
         return user;
     }
 
@@ -55,6 +56,7 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
         usersAuth.put(a.authToken(), a.username());
     }
 
+
     public AuthData getAuth(String authToken) {
         if (!usersAuth.containsKey(authToken))
             return null;
@@ -62,10 +64,11 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
         return new AuthData(username, authToken);
     }
 
+
     public void deleteAuth(String authToken) {
         usersAuth.remove(authToken);
-        //System.out.println(usersAuth);
     }
+
 
     public GameData createGame(String gameName) {
         GameData gameData = new GameData(nextGameID++, null, null, gameName, new ChessGame());
@@ -73,10 +76,11 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
         return gameData;
     }
 
+
     public ArrayList<GameData> listGames() {
-        System.out.println("list Games: " + currentGames);
         return currentGames;
     }
+
 
     public GameData getGame(int gameID) {
         int i = 0;
@@ -90,15 +94,14 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
         return gameData;
     }
 
+
     public void updateGame(GameData gameData) {
         int i = 0;
-        System.out.println(currentGames.size());
         while (i < currentGames.size()) {
             if (Objects.equals(currentGames.get(i).gameID(), gameData.gameID())) {
                 currentGames.set(i, gameData);
             }
             i++;
         }
-
     }
 }

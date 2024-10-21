@@ -9,12 +9,12 @@ import server.CreateGame.CreateGameHandler;
 import server.ListGames.ListGamesHandler;
 import server.JoinGame.JoinGameHandler;
 import spark.*;
-import service.UserService;
+import service.Service;
 
 public class Server {
 
     MemoryGameDAO memory = new MemoryGameDAO();
-    UserService service = new UserService(memory, memory, memory);
+    Service service = new Service(memory);
     RegisterHandler registerHandler = new RegisterHandler(service);
     LoginHandler loginHandler = new LoginHandler(service);
     LogoutHandler logoutHandler = new LogoutHandler(service);
