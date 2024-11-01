@@ -3,6 +3,7 @@ import dataaccess.*;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
+import org.mindrot.jbcrypt.BCrypt;
 import server.creategame.CreateGameResult;
 import server.joingame.JoinGameRequest;
 import server.listgames.ListGamesResult;
@@ -20,7 +21,7 @@ public class Service {
     private final AuthDAO authDataAccess;
     private final GameDAO gameDataAccess;
 
-    public Service(MemoryGameDAO dataAccess) {
+    public Service(MySQLGameDAO dataAccess) {
         this.userDataAccess = dataAccess;
         this.authDataAccess = dataAccess;
         this.gameDataAccess = dataAccess;
@@ -44,7 +45,7 @@ public class Service {
         if (user == null) {
             return null;
         }
-        if (Objects.equals(user.password(), request.getPassword())) {
+        if (BCrypt.checkpw(request.getPassword(), user.password())) {
             AuthData auth = new AuthData(request.getUsername(), UUID.randomUUID().toString());
             authDataAccess.createAuth(auth);
             return new LoginResult(auth);

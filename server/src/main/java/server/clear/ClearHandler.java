@@ -15,7 +15,7 @@ public class ClearHandler {
         this.service = service;
     }
 
-    public Object handleRequest (Request req, Response res) {
+    public Object handleRequest (Response res) {
         Gson gson = new Gson();
         try {
             service.clear();

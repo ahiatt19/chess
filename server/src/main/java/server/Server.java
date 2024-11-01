@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.MemoryGameDAO;
+import dataaccess.MySQLGameDAO;
 import server.clear.ClearHandler;
 import server.login.LoginHandler;
 import server.register.RegisterHandler;
@@ -12,9 +13,9 @@ import spark.*;
 import service.Service;
 
 public class Server {
-
-    MemoryGameDAO memory = new MemoryGameDAO();
-    Service service = new Service(memory);
+    MySQLGameDAO database = new MySQLGameDAO();
+    //MemoryGameDAO memory = new MemoryGameDAO();
+    Service service = new Service(database);
     RegisterHandler registerHandler = new RegisterHandler(service);
     LoginHandler loginHandler = new LoginHandler(service);
     LogoutHandler logoutHandler = new LogoutHandler(service);
@@ -22,6 +23,7 @@ public class Server {
     ListGamesHandler listGamesHandler = new ListGamesHandler(service);
     JoinGameHandler joinGameHandler = new JoinGameHandler(service);
     ClearHandler clearHandler = new ClearHandler(service);
+
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -41,7 +43,7 @@ public class Server {
         //Join a Chess Game
         Spark.put("/game", (req, res) -> joinGameHandler.handleRequest(req, res));
         //Clear ALL data from the database
-        Spark.delete("/db", (req, res) -> clearHandler.handleRequest(req, res));
+        Spark.delete("/db", (req, res) -> clearHandler.handleRequest(res));
 
         Spark.awaitInitialization();
         return Spark.port();
