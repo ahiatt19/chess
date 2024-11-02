@@ -303,4 +303,57 @@ public class DataAccessTests {
         //0
         Assertions.assertEquals(0, dataAccess.authSize());
     }
+
+    @Test
+    @Order(14)
+    @DisplayName("Clear Users +")
+    public void clearUsersTest() throws DataAccessException {
+        //Create Users
+        service.register(new RegisterRequest("user1", "pass1", "email"));
+        service.register(new RegisterRequest("user2", "pass2", "email"));
+        //2 users in the users table
+        Assertions.assertEquals(2, dataAccess.userSize());
+
+        //Clear users table
+        dataAccess.clearUsers();
+        // 0 rows
+        Assertions.assertEquals(0, dataAccess.userSize());
+    }
+
+    @Test
+    @Order(15)
+    @DisplayName("Clear Auth +")
+    public void clearAuthTest() throws DataAccessException {
+        //Create Auths when register
+        service.register(new RegisterRequest("user3", "pass3", "email"));
+        service.register(new RegisterRequest("user4", "pass4", "email"));
+        //2 users in the auth table
+        Assertions.assertEquals(2, dataAccess.authSize());
+
+        //Clear auth table
+        dataAccess.clearAuths();
+        // should have 0 rows
+        Assertions.assertEquals(0, dataAccess.authSize());
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("Clear Games +")
+    public void clearGamesTest() throws DataAccessException {
+        //we need an auth
+        RegisterResult regResult1 = service.register(new RegisterRequest("userrr1", "passs1", "email"));
+        //Create 3
+        service.createGame("game1", regResult1.getAuthToken());
+        service.createGame("game2", regResult1.getAuthToken());
+        service.createGame("game3", regResult1.getAuthToken());
+
+        //3 games currently
+        Assertions.assertEquals(3, dataAccess.gamesSize());
+
+        //Clear the games
+        dataAccess.clearGames();
+
+        //no games in the table
+        Assertions.assertEquals(0, dataAccess.gamesSize());
+    }
 }
