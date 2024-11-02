@@ -154,7 +154,7 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                 ChessGame chessGame = new ChessGame();
                 //System.out.println(chessGame.game);
                 var chessGameString = serializer.toJson(chessGame.game);
-                System.out.println(chessGameString);
+                //System.out.println(chessGameString);
                 ps.setString(2, chessGameString);
 
                 ps.executeUpdate();
@@ -172,7 +172,28 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
 
 
     public ArrayList<GameData> listGames() throws DataAccessException {
-        return new ArrayList<>();
+        var list = new ArrayList<GameData>();
+        var sql = "SELECT * FROM games";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(sql)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        var gameID = rs.getInt("gameID");
+                        var whiteUsername = rs.getString("white_username");
+                        var blackUsername = rs.getString("black_username");
+                        var gameName = rs.getString("gameName");
+                        var jsonGame = rs.getString("game");
+
+                        var serializer = new Gson();
+                        var gameFromJson = serializer.fromJson(jsonGame, ChessGame.class);
+                        list.add(new GameData(gameID, whiteUsername, blackUsername, gameName, gameFromJson));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", sql, e.getMessage()));
+        }
+        return list;
     }
 
 
