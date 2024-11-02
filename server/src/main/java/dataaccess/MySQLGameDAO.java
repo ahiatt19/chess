@@ -1,11 +1,9 @@
 package dataaccess;
 
+import chess.ChessBoard;
 import chess.ChessGame;
-import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -153,7 +151,7 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                 var serializer = new Gson();
                 ChessGame chessGame = new ChessGame();
                 //System.out.println(chessGame.game);
-                var chessGameString = serializer.toJson(chessGame.game);
+                var chessGameString = serializer.toJson(chessGame);
                 //System.out.println(chessGameString);
                 ps.setString(2, chessGameString);
 
@@ -209,10 +207,11 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                         var blackUsername = rs.getString("black_username");
                         var gameName = rs.getString("gameName");
                         var jsonGame = rs.getString("game");
+                        System.out.println(jsonGame);
 
                         var serializer = new Gson();
-                        var gameFromJson = serializer.fromJson(jsonGame, ChessGame.class);
-                        //System.out.println(gameFromJson.getBoard().getPiece(new ChessPosition(1, 1)));
+                        var gameFromJson = serializer.fromJson(jsonGame, ChessBoard.class);//.getBoard().getPiece(new ChessPosition(2, 1))
+                        System.out.println(gameFromJson);
                         return new GameData(gameID, whiteUsername, blackUsername, gameName, gameFromJson);
                     }
                 }
@@ -231,10 +230,10 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
             try (var ps = conn.prepareStatement(sql)) {
                 ps.setString(1, gameData.whiteUsername());
                 ps.setString(2, gameData.blackUsername());
-
+                //System.out.println(gameData.game());
                 var serializer = new Gson();
                 var chessGameString = serializer.toJson(gameData.game().getBoard());
-                //System.out.println(gameData.game());
+
                 //System.out.println(chessGameString);
                 ps.setString(3, chessGameString);
                 ps.setInt(4, gameData.gameID());
@@ -273,7 +272,7 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                 `white_username` varchar(225),
                 `black_username` varchar(225),
                 `gameName` varchar(225) NOT NULL,
-                `game` varchar(1000) NOT NULL,
+                `game` varchar(5000) NOT NULL,
                 PRIMARY KEY (`gameID`),
                 INDEX(`gameName`)
             );
@@ -292,5 +291,38 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
+    }
+
+
+    //Created for testing
+    public int userSize() {
+        return size("users");
+    }
+
+    //Created for testing
+    public int gamesSize() {
+        return size("games");
+    }
+
+    //Created for testing
+    public int authSize() {
+        return size("authentication");
+    }
+
+    public int size(String table) {
+        var sql = "SELECT COUNT(*) AS row_count FROM ?;";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(sql)) {
+                ps.setString(1, table);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("row_count");
+                    }
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            System.out.println("nah");
+        }
+        return 10000000;
     }
 }

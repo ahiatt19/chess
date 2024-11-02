@@ -1,6 +1,9 @@
-package service;
+package passoff.server.dataaccess;
 
+import chess.*;
 import dataaccess.DataAccessException;
+import dataaccess.MySQLGameDAO;
+import model.GameData;
 import org.junit.jupiter.api.*;
 import server.creategame.CreateGameResult;
 import server.joingame.JoinGameRequest;
@@ -8,36 +11,32 @@ import server.listgames.ListGamesResult;
 import server.login.LoginRequest;
 import server.register.RegisterRequest;
 import server.register.RegisterResult;
-import dataaccess.MySQLGameDAO;
+import service.Service;
 
-import org.junit.jupiter.api.Test;
+public class DataAccessTests {
 
-public class ServiceTests {
-
-    //MemoryGameDAO memory = new MemoryGameDAO();
     MySQLGameDAO dataAccess = new MySQLGameDAO();
     Service service = new Service(dataAccess);
 
     @BeforeEach
     public void setup() throws DataAccessException {
         service.clear();
-
-        //one user already logged in
-        //TestAuthResult regResult = serverFacade.register(existingUser);
-        //existingAuth = regResult.getAuthToken();
     }
 
     @Test
     @Order(1)
     @DisplayName("Register User +")
     public void registerUser() throws DataAccessException {
-        RegisterRequest regRequest = new RegisterRequest("u", "p", "e");
+        RegisterRequest regRequest = new RegisterRequest("username", "password", "email");
+        RegisterRequest regRequest2 = new RegisterRequest("username2", "password2", "email");
 
         service.register(regRequest);
+        service.register(regRequest2);
 
-        Assertions.assertEquals("u", dataAccess.getUser("u").username());
-        Assertions.assertEquals(1, dataAccess.userSize());
-        Assertions.assertEquals(1, dataAccess.authSize());
+        Assertions.assertEquals("username", dataAccess.getUser("username").username());
+        Assertions.assertEquals("username2", dataAccess.getUser("username2").username());
+        Assertions.assertEquals(2, dataAccess.userSize());
+        Assertions.assertEquals(2, dataAccess.authSize());
     }
 
     @Test
@@ -151,9 +150,14 @@ public class ServiceTests {
         RegisterResult regResult = service.register(new RegisterRequest("GoodUser", "pass", "email"));
 
         //create game with auth token
-        service.createGame("Game400", regResult.getAuthToken());
+        CreateGameResult result = service.createGame("Game400", regResult.getAuthToken());
 
-        //Still only one user in memory
+        //white user is empty
+        Assertions.assertEquals(null, dataAccess.getGame(result.getGameID()).whiteUsername());
+        //black user is empty
+        Assertions.assertEquals(null, dataAccess.getGame(result.getGameID()).blackUsername());
+        //check the game is the right type
+        Assertions.assertEquals(new ChessGame(), dataAccess.getGame(result.getGameID()).game());
         Assertions.assertEquals(1, dataAccess.gamesSize());
     }
 
@@ -163,6 +167,13 @@ public class ServiceTests {
     public void createBadGameTest() throws DataAccessException {
         //create game without a valid auth token
         service.createGame("Game400", "This-is-not-an-authToken");
+
+        //Should have no games
+        Assertions.assertNotEquals(1, dataAccess.gamesSize());
+
+
+        //create game without a valid auth token
+        service.createGame("", "This-is-not-an-authToken");
 
         //Should have no games
         Assertions.assertNotEquals(1, dataAccess.gamesSize());
@@ -208,7 +219,7 @@ public class ServiceTests {
     @Test
     @Order(11)
     @DisplayName("Update Game +")
-    public void updateGameTest() throws DataAccessException {
+    public void updateGameTest() throws DataAccessException, InvalidMoveException {
         RegisterResult regResult1 = service.register(new RegisterRequest("FirstUser", "pass", "email"));
         RegisterResult regResult2 = service.register(new RegisterRequest("OtherUser67", "6767", "email"));
 
@@ -226,6 +237,21 @@ public class ServiceTests {
         //Check that the users are correctly in memory in the game Data
         Assertions.assertEquals("OtherUser67", dataAccess.getGame(createGameResult.getGameID()).blackUsername());
         Assertions.assertEquals("FirstUser", dataAccess.getGame(createGameResult.getGameID()).whiteUsername());
+
+
+        //WHITE MOVE PAWN
+        ChessGame game = dataAccess.getGame(createGameResult.getGameID()).game();
+        game.makeMove(new ChessMove(new ChessPosition(2, 1), new ChessPosition(3, 1), null));
+
+        //System.out.println(game.getBoard());
+
+
+        dataAccess.updateGame(new GameData(createGameResult.getGameID(), "FirstUser", "OtherUser67", "FirstGameWHAT!!", game));
+
+        Assertions.assertEquals(new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN),
+                dataAccess.getGame(createGameResult.getGameID()).game().getBoard().getPiece(new ChessPosition(3, 1)));
+
+
     }
 
 
