@@ -237,11 +237,6 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
 
                         ChessGame gameFromJson = serializer.fromJson(jsonGame, ChessGame.class);
 
-
-                        // Log the chess game for debugging purposes
-                        System.out.println("FROM CHESS GAME: " + gameFromJson);//ChessGame chessGame = new ChessGame();
-                        //chessGame.setBoard(gameFromJson);
-                        //System.out.println("CHESSGAME " + chessGame);
                         return new GameData(gameID, whiteUsername, blackUsername, gameName, gameFromJson);
                     }
                 }
@@ -277,12 +272,10 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                 ps.setString(1, gameData.whiteUsername());
                 ps.setString(2, gameData.blackUsername());
 
-                System.out.println(gameData.game());
                 var gsonBuilder = new GsonBuilder();
                 gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());
                 var serializer = gsonBuilder.create();
 
-                //System.out.println(chessGameString);
                 var chessGameString = serializer.toJson(gameData.game());
                 ps.setString(3, chessGameString);
                 ps.setInt(4, gameData.gameID());
