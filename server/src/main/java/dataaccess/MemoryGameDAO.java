@@ -5,6 +5,7 @@ import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import server.listgames.ListGamesData;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -86,8 +87,15 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
     }
 
 
-    public ArrayList<GameData> listGames() {
-        return currentGames;
+    public ArrayList<ListGamesData> listGames() {
+        int i = 0;
+        var games = new ArrayList<ListGamesData>();
+        while (i < currentGames.size()) {
+            games.add(new ListGamesData(currentGames.get(i).gameID(), currentGames.get(i).whiteUsername(),
+                            currentGames.get(i).blackUsername(), currentGames.get(i).gameName()));
+            i++;
+        }
+        return games;
     }
 
 

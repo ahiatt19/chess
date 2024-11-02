@@ -243,7 +243,7 @@ public class DataAccessTests {
         ChessGame game = dataAccess.getGame(createGameResult.getGameID()).game();
         game.makeMove(new ChessMove(new ChessPosition(2, 1), new ChessPosition(3, 1), null));
 
-        //System.out.println(game.getBoard());
+        System.out.println(game);
 
 
         dataAccess.updateGame(new GameData(createGameResult.getGameID(), "FirstUser", "OtherUser67", "FirstGameWHAT!!", game));

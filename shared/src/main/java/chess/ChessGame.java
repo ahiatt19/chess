@@ -11,7 +11,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessGame {
-    public static ChessBoard game;
+    private static ChessBoard game;
     private static TeamColor currentTeamTurn;
 
     public ChessGame() {
@@ -22,9 +22,9 @@ public class ChessGame {
 
     @Override
     public String toString() {
-        return "ChessGame{" +
+        return "ChessGame{ " +
                 "game=" + game +
-                '}';
+                "} Current_Turn= " + currentTeamTurn;
     }
 
     @Override

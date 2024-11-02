@@ -8,6 +8,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
+import server.listgames.ListGamesData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -150,13 +151,11 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
 
                 var serializer = new Gson();
                 ChessGame chessGame = new ChessGame();
-                //System.out.println(chessGame.game);
+
                 var chessGameString = serializer.toJson(chessGame);
-                //System.out.println(chessGameString);
                 ps.setString(2, chessGameString);
 
                 ps.executeUpdate();
-                //ps.executeQuery();
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     generatedKeys.next();
                     return generatedKeys.getInt(1);
@@ -169,8 +168,8 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
     }
 
 
-    public ArrayList<GameData> listGames() throws DataAccessException {
-        var list = new ArrayList<GameData>();
+    public ArrayList<ListGamesData> listGames() throws DataAccessException {
+        var list = new ArrayList<ListGamesData>();
         var sql = "SELECT * FROM games";
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(sql)) {
@@ -180,11 +179,7 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                         var whiteUsername = rs.getString("white_username");
                         var blackUsername = rs.getString("black_username");
                         var gameName = rs.getString("gameName");
-                        var jsonGame = rs.getString("game");
-
-                        var serializer = new Gson();
-                        var gameFromJson = serializer.fromJson(jsonGame, ChessGame.class);
-                        list.add(new GameData(gameID, whiteUsername, blackUsername, gameName, gameFromJson));
+                        list.add(new ListGamesData(gameID, whiteUsername, blackUsername, gameName));
                     }
                 }
             }
@@ -206,11 +201,11 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                         var whiteUsername = rs.getString("white_username");
                         var blackUsername = rs.getString("black_username");
                         var gameName = rs.getString("gameName");
-                        var jsonGame = rs.getString("game");
-                        System.out.println(jsonGame);
+                        var jsonGameBoard = rs.getString("game");
+                        //System.out.println(jsonGameBoard);
 
                         var serializer = new Gson();
-                        var gameFromJson = serializer.fromJson(jsonGame, ChessBoard.class);//.getBoard().getPiece(new ChessPosition(2, 1))
+                        var gameFromJson = serializer.fromJson(jsonGameBoard, ChessGame.class);//.getBoard().getPiece(new ChessPosition(2, 1))
                         System.out.println(gameFromJson);
                         return new GameData(gameID, whiteUsername, blackUsername, gameName, gameFromJson);
                     }
