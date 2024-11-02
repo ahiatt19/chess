@@ -3,13 +3,14 @@ package dataaccess;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPosition;
-import com.google.gson.Gson;
+import com.google.gson.*;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 import server.listgames.ListGamesData;
 
+import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -20,6 +21,7 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
     public MySQLGameDAO() {
         try {
             configureDatabase();
+            //createSerializer();
         } catch (DataAccessException ex) {
                 System.out.println("didn't connect to DB");
             }
@@ -149,12 +151,13 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
             try (var ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, gameName);
 
-                var serializer = new Gson();
-                ChessGame chessGame = new ChessGame();
+                var gsonBuilder = new GsonBuilder();
+                gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());
+                var serializer = gsonBuilder.create();
 
-                var chessGameString = serializer.toJson(chessGame);
+                var chessGameString = serializer.toJson(new ChessGame());
+
                 ps.setString(2, chessGameString);
-
                 ps.executeUpdate();
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     generatedKeys.next();
@@ -189,24 +192,56 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
         return list;
     }
 
+    public static Gson createSerializer() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+
+        // Register the ChessGame deserializer
+        gsonBuilder.registerTypeAdapter(ChessGame.class, new JsonDeserializer<ChessGame>() {
+            @Override
+            public ChessGame deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                JsonObject jsonObject = json.getAsJsonObject();
+
+                // Deserialize ChessBoard from the JSON
+                ChessBoard chessBoard = context.deserialize(jsonObject.get("game"), ChessBoard.class);
+                ChessGame game = new ChessGame();
+                game.setBoard(chessBoard); // Set the board
+
+                // Optionally, set the current team turn if it's part of your JSON structure
+                if (jsonObject.has("currentTeamTurn")) {
+                    String currentTurn = jsonObject.get("currentTeamTurn").getAsString();
+                    game.setTeamTurn(ChessGame.TeamColor.valueOf(currentTurn));
+                }
+
+                return game;
+            }
+        });
+
+        return gsonBuilder.create();
+    }
 
 
     public GameData getGame(int gameID) throws DataAccessException {
         var sql = "SELECT gameID, white_username, black_username, gameName, game FROM games WHERE gameID=?";
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(sql)) {
-                ps.setString(1, Integer.toString(gameID));
+                ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         var whiteUsername = rs.getString("white_username");
                         var blackUsername = rs.getString("black_username");
                         var gameName = rs.getString("gameName");
-                        var jsonGameBoard = rs.getString("game");
-                        //System.out.println(jsonGameBoard);
+                        var jsonGame = rs.getString("game");
 
-                        var serializer = new Gson();
-                        var gameFromJson = serializer.fromJson(jsonGameBoard, ChessGame.class);//.getBoard().getPiece(new ChessPosition(2, 1))
-                        System.out.println(gameFromJson);
+                        // Create Gson instance with custom serializer if needed
+                        Gson serializer = createSerializer();
+
+                        ChessGame gameFromJson = serializer.fromJson(jsonGame, ChessGame.class);
+
+
+                        // Log the chess game for debugging purposes
+                        System.out.println("FROM CHESS GAME: " + gameFromJson);//ChessGame chessGame = new ChessGame();
+                        //chessGame.setBoard(gameFromJson);
+                        //System.out.println("CHESSGAME " + chessGame);
                         return new GameData(gameID, whiteUsername, blackUsername, gameName, gameFromJson);
                     }
                 }
@@ -218,6 +253,22 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
 
     }
 
+    public class ChessGameSerializer implements JsonSerializer<ChessGame> {
+        @Override
+        public JsonElement serialize(ChessGame chessGame, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject jsonObject = new JsonObject();
+
+            // Serialize the current team turn
+            jsonObject.addProperty("currentTeamTurn", chessGame.getTeamTurn().toString());
+
+            // Serialize the chess board (game)
+            JsonElement boardJson = context.serialize(chessGame.getBoard());
+            jsonObject.add("game", boardJson);
+
+            return jsonObject;
+        }
+    }
+
 
     public void updateGame(GameData gameData) throws DataAccessException {
         var sql = "UPDATE games SET white_username=?, black_username=?, game=? WHERE gameID=?";
@@ -225,11 +276,14 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
             try (var ps = conn.prepareStatement(sql)) {
                 ps.setString(1, gameData.whiteUsername());
                 ps.setString(2, gameData.blackUsername());
-                //System.out.println(gameData.game());
-                var serializer = new Gson();
-                var chessGameString = serializer.toJson(gameData.game().getBoard());
+
+                System.out.println(gameData.game());
+                var gsonBuilder = new GsonBuilder();
+                gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());
+                var serializer = gsonBuilder.create();
 
                 //System.out.println(chessGameString);
+                var chessGameString = serializer.toJson(gameData.game());
                 ps.setString(3, chessGameString);
                 ps.setInt(4, gameData.gameID());
                 ps.executeUpdate();
@@ -291,24 +345,43 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
 
     //Created for testing
     public int userSize() {
-        return size("users");
+        var sql = "SELECT COUNT(*) AS row_count FROM users;";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(sql)) {
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("row_count");
+                    }
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            System.out.println("nah");
+        }
+        return 10000000;
     }
 
     //Created for testing
     public int gamesSize() {
-        return size("games");
+        var sql = "SELECT COUNT(*) AS row_count FROM games;";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(sql)) {
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("row_count");
+                    }
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            System.out.println("nah");
+        }
+        return 10000000;
     }
 
     //Created for testing
     public int authSize() {
-        return size("authentication");
-    }
-
-    public int size(String table) {
-        var sql = "SELECT COUNT(*) AS row_count FROM ?;";
+        var sql = "SELECT COUNT(*) AS row_count FROM authentication;";
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(sql)) {
-                ps.setString(1, table);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return rs.getInt("row_count");

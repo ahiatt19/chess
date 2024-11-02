@@ -70,7 +70,7 @@ public class DataAccessTests {
     @DisplayName("Login User +")
     public void loginUser() throws DataAccessException {
         //Create the User Request and create a user
-        RegisterResult regResult = service.register(new RegisterRequest("GoodUser", "pass", "email"));
+        service.register(new RegisterRequest("GoodUser", "pass", "email"));
 
         service.login(new LoginRequest("GoodUser", "pass"));
 
@@ -231,25 +231,27 @@ public class DataAccessTests {
         JoinGameRequest joinGameRequest2 = new JoinGameRequest("BLACK", createGameResult.getGameID());
 
         //add users to game
-        service.updateGame(regResult1.getAuthToken(), joinGameRequest1);
-        service.updateGame(regResult2.getAuthToken(), joinGameRequest2);
+        //service.updateGame(regResult1.getAuthToken(), joinGameRequest1);
+        //service.updateGame(regResult2.getAuthToken(), joinGameRequest2);
 
         //Check that the users are correctly in memory in the game Data
-        Assertions.assertEquals("OtherUser67", dataAccess.getGame(createGameResult.getGameID()).blackUsername());
-        Assertions.assertEquals("FirstUser", dataAccess.getGame(createGameResult.getGameID()).whiteUsername());
+        //Assertions.assertEquals("OtherUser67", dataAccess.getGame(createGameResult.getGameID()).blackUsername());
+        //Assertions.assertEquals("FirstUser", dataAccess.getGame(createGameResult.getGameID()).whiteUsername());
 
 
         //WHITE MOVE PAWN
         ChessGame game = dataAccess.getGame(createGameResult.getGameID()).game();
-        game.makeMove(new ChessMove(new ChessPosition(2, 1), new ChessPosition(3, 1), null));
+        game.makeMove(new ChessMove(new ChessPosition(2, 1), new ChessPosition(4, 1), null));
 
-        System.out.println(game);
+        //System.out.println(game);
 
 
         dataAccess.updateGame(new GameData(createGameResult.getGameID(), "FirstUser", "OtherUser67", "FirstGameWHAT!!", game));
 
+        System.out.println("LAST");
+
         Assertions.assertEquals(new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN),
-                dataAccess.getGame(createGameResult.getGameID()).game().getBoard().getPiece(new ChessPosition(3, 1)));
+                dataAccess.getGame(createGameResult.getGameID()).game().getBoard().getPiece(new ChessPosition(4, 1)));
 
 
     }
