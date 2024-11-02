@@ -67,8 +67,8 @@ public class Service {
     public CreateGameResult createGame(String gameName, String authToken) throws DataAccessException {
         AuthData authData = authDataAccess.getAuth(authToken);
         if (authData != null) {
-            GameData gameData = gameDataAccess.createGame(gameName);
-            return new CreateGameResult(gameData.gameID());
+            int gameID = gameDataAccess.createGame(gameName);
+            return new CreateGameResult(gameID);
         } else {
             return null;
         }

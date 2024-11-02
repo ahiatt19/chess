@@ -11,7 +11,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private static ChessBoard game;
+    public static ChessBoard game;
     private static TeamColor currentTeamTurn;
 
     public ChessGame() {

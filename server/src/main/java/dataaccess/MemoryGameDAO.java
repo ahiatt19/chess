@@ -79,10 +79,10 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
     }
 
 
-    public GameData createGame(String gameName) {
+    public int createGame(String gameName) {
         GameData gameData = new GameData(nextGameID++, null, null, gameName, new ChessGame());
         currentGames.add(gameData);
-        return gameData;
+        return gameData.gameID();
     }
 
 

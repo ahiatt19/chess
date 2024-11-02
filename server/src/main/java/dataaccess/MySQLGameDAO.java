@@ -1,12 +1,19 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
@@ -137,20 +144,29 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
         }
     }
 
-
-    public GameData createGame(String gameName) throws DataAccessException {
-        var sql = "INSERT INTO games (gameName, game)" +
-                "VALUES (?, ?)";
+    public int createGame(String gameName) throws DataAccessException {
+        var sql = "INSERT INTO games (gameName, game) VALUES (?, ?)";
         try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(sql)) {
+            try (var ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, gameName);
-                ps.setString(2, new ChessGame());
+
+                var serializer = new Gson();
+                ChessGame chessGame = new ChessGame();
+                //System.out.println(chessGame.game);
+                var chessGameString = serializer.toJson(chessGame.game);
+                ps.setString(2, chessGameString);
+
                 ps.executeUpdate();
+                //ps.executeQuery();
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    generatedKeys.next();
+                    return generatedKeys.getInt(1);
+                }
             }
+
         } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to insert into database: %s, %s", sql, e.getMessage()));
         }
-        return new GameData(1, "w_user", "b_user", gameName, new ChessGame());
     }
 
 
@@ -159,12 +175,51 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
     }
 
 
+
     public GameData getGame(int gameID) throws DataAccessException {
-        return new GameData(gameID, "w_user", "b_user", "gameName", new ChessGame());
+        var sql = "SELECT gameID, white_username, black_username, gameName, game FROM games WHERE gameID=?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(sql)) {
+                ps.setString(1, Integer.toString(gameID));
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        var whiteUsername = rs.getString("white_username");
+                        var blackUsername = rs.getString("black_username");
+                        var gameName = rs.getString("gameName");
+                        var jsonGame = rs.getString("game");
+
+                        var serializer = new Gson();
+                        var gameFromJson = serializer.fromJson(jsonGame, ChessGame.class);
+                        //System.out.println(gameFromJson.getBoard().getPiece(new ChessPosition(1, 1)));
+                        return new GameData(gameID, whiteUsername, blackUsername, gameName, gameFromJson);
+                    }
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", sql, e.getMessage()));
+        }
+
     }
 
 
-    public void updateGame(GameData gameData) throws DataAccessException {}
+    public void updateGame(GameData gameData) throws DataAccessException {
+        var sql = "UPDATE games SET white_username=?, black_username=?, game=? WHERE gameID=?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(sql)) {
+                ps.setString(1, gameData.whiteUsername());
+                ps.setString(2, gameData.blackUsername());
+
+                var serializer = new Gson();
+                var chessGameString = serializer.toJson(gameData.game());
+                ps.setString(3, chessGameString);
+                ps.setInt(4, gameData.gameID());
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", sql, e.getMessage()));
+        }
+    }
 
 
     private final String[] createStatements = {

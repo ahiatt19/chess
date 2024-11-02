@@ -5,7 +5,7 @@ import model.GameData;
 import java.util.ArrayList;
 
 public interface GameDAO {
-    GameData createGame(String gameName) throws DataAccessException ;
+    int createGame(String gameName) throws DataAccessException ;
 
     ArrayList<GameData> listGames() throws DataAccessException ;
 
