@@ -21,7 +21,6 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
     public MySQLGameDAO() {
         try {
             configureDatabase();
-            //createSerializer();
         } catch (DataAccessException ex) {
                 System.out.println("didn't connect to DB");
             }
@@ -154,7 +153,6 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                 var gsonBuilder = new GsonBuilder();
                 gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());
                 var serializer = gsonBuilder.create();
-
                 var chessGameString = serializer.toJson(new ChessGame());
 
                 ps.setString(2, chessGameString);
@@ -204,9 +202,8 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                 // Deserialize ChessBoard from the JSON
                 ChessBoard chessBoard = context.deserialize(jsonObject.get("game"), ChessBoard.class);
                 ChessGame game = new ChessGame();
-                game.setBoard(chessBoard); // Set the board
+                game.setBoard(chessBoard);
 
-                // Optionally, set the current team turn if it's part of your JSON structure
                 if (jsonObject.has("currentTeamTurn")) {
                     String currentTurn = jsonObject.get("currentTeamTurn").getAsString();
                     game.setTeamTurn(ChessGame.TeamColor.valueOf(currentTurn));
@@ -215,7 +212,6 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                 return game;
             }
         });
-
         return gsonBuilder.create();
     }
 
