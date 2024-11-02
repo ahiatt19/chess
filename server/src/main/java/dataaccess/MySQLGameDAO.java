@@ -2,7 +2,6 @@ package dataaccess;
 
 import chess.ChessBoard;
 import chess.ChessGame;
-import chess.ChessPosition;
 import com.google.gson.*;
 import model.AuthData;
 import model.GameData;
