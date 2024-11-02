@@ -14,7 +14,6 @@ import service.Service;
 
 public class Server {
     MySQLGameDAO database = new MySQLGameDAO();
-    //MemoryGameDAO memory = new MemoryGameDAO();
     Service service = new Service(database);
     RegisterHandler registerHandler = new RegisterHandler(service);
     LoginHandler loginHandler = new LoginHandler(service);
