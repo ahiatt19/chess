@@ -333,41 +333,22 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
 
     //Created for testing
     public int userSize() {
-        var sql = "SELECT COUNT(*) AS row_count FROM users;";
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(sql)) {
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return rs.getInt("row_count");
-                    }
-                }
-            }
-        } catch (SQLException | DataAccessException e) {
-            System.out.println("nah");
-        }
-        return 10000000;
+        return size("users");
     }
 
     //Created for testing
     public int gamesSize() {
-        var sql = "SELECT COUNT(*) AS row_count FROM games;";
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(sql)) {
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return rs.getInt("row_count");
-                    }
-                }
-            }
-        } catch (SQLException | DataAccessException e) {
-            System.out.println("nah");
-        }
-        return 10000000;
+        return size("games");
     }
+
 
     //Created for testing
     public int authSize() {
-        var sql = "SELECT COUNT(*) AS row_count FROM authentication;";
+        return size("authentication");
+    }
+
+    public int size(String table) {
+        var sql = "SELECT COUNT(*) AS row_count FROM " + table;
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(sql)) {
                 try (var rs = ps.executeQuery()) {
