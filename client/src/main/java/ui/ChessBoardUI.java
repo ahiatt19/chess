@@ -18,29 +18,46 @@ public class ChessBoardUI {
     public static void main(String[] args) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
-        drawHeaderFooter(out);
-
         ChessBoard chessBoard = new ChessBoard();
         chessBoard.resetBoard();
+        blackPerspective(out, chessBoard);
+        out.println();
 
-        drawChessBoard(out, chessBoard);
+        whitePerspective(out, chessBoard);
 
-        drawHeaderFooter(out);
 
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_WHITE);
+
+
     }
 
-    private static void drawHeaderFooter(PrintStream out) {
+    private static void whitePerspective(PrintStream out, ChessBoard chessBoard) {
+        //out.print(chessBoard);
+
+        String[] whiteHeaders = {" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h "};
+        drawHeaderFooter(out, whiteHeaders);
+
+        drawChessBoard(out, chessBoard, "white");
+
+        drawHeaderFooter(out, whiteHeaders);
+    }
+
+    private static void blackPerspective(PrintStream out, ChessBoard chessBoard) {
+        String[] blackHeaders = {" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
+        drawHeaderFooter(out, blackHeaders);
+
+        drawChessBoard(out, chessBoard, "black");
+
+        drawHeaderFooter(out, blackHeaders);
+    }
+
+    private static void drawHeaderFooter(PrintStream out, String[] headers) {
         setBorder(out);
 
         out.print("   ");
 
-        String[] blackHeaders = {" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
-        String[] whiteHeaders = {" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h "};
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             out.print(SMALL_EMPTY);
-            drawHeaderFooter(out, whiteHeaders[boardCol]);
+            drawHeaderFooter(out, headers[boardCol]);
             out.print(SMALL_EMPTY);
             out.print(SMALL_EMPTY);
         }
@@ -67,33 +84,61 @@ public class ChessBoardUI {
         setBlack(out);
     }
 
-    private static void drawChessBoard(PrintStream out, ChessBoard chessBoard) {
-        for (int boardRow = 1; boardRow <= BOARD_SIZE_IN_SQUARES; ++boardRow) {
-            printRow(out, boardRow);
+    private static void drawChessBoard(PrintStream out, ChessBoard chessBoard, String perspective) {
+        switch (perspective) {
+            case "white":
+                for (int boardRow = 1; boardRow <= BOARD_SIZE_IN_SQUARES; ++boardRow) {
+                    int actualRow = (boardRow - 9) * -1;
+                    printRow(out, actualRow);
 
-            drawRowOfSquares(out, boardRow, chessBoard);
-            printRow(out, boardRow);
-            out.println();
+                    drawRowOfSquares(out, boardRow, chessBoard, "white");
+                    printRow(out, actualRow);
+                    out.println();
+                }
+                break;
+            case "black":
+                for (int boardRow = 1; boardRow <= BOARD_SIZE_IN_SQUARES; ++boardRow) {
+
+                    printRow(out, boardRow);
+
+                    drawRowOfSquares(out, boardRow, chessBoard, "black");
+                    printRow(out, boardRow);
+                    out.println();
+                }
+                break;
         }
+
     }
 
-    private static void drawRowOfSquares(PrintStream out, int boardRow, ChessBoard chessBoard) {
+    private static void drawRowOfSquares(PrintStream out, int boardRow, ChessBoard chessBoard, String perspective) {
         for (int squareRow = 1; squareRow <= SQUARE_SIZE_IN_PADDED_CHARS; ++squareRow) {
             for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                setLightPink(out);
-                int newRow = (boardRow - 9) * - 1;
-                if ((newRow + boardCol) % 2 == 0)
-                    setDarkPink(out);
-                else {
+                if ((boardRow + boardCol) % 2 == 0)
                     setLightPink(out);
+                else {
+                    setDarkPink(out);
                 }
-                if (chessBoard.getPiece(new ChessPosition(newRow, boardCol)) == null) {
-
-                    out.print(EMPTY.repeat(1));
-                    setBlack(out);
-                } else {
-                    printPlayer(out, chessBoard.getPiece(new ChessPosition(newRow, boardCol)));
-                    setBlack(out);
+                int newRow = (boardRow - 9) * -1;
+                int newCol = (boardCol - 9) * -1;
+                switch (perspective) {
+                    case "white":
+                        if (chessBoard.getPiece(new ChessPosition(newRow, boardCol)) == null) {
+                            out.print(EMPTY.repeat(1));
+                            setBlack(out);
+                        } else {
+                            printPlayer(out, chessBoard.getPiece(new ChessPosition(newRow, boardCol)));
+                            setBlack(out);
+                        }
+                        break;
+                    case "black":
+                        if (chessBoard.getPiece(new ChessPosition(boardRow, newCol)) == null) {
+                            out.print(EMPTY.repeat(1));
+                            setBlack(out);
+                        } else {
+                            printPlayer(out, chessBoard.getPiece(new ChessPosition(boardRow, newCol)));
+                            setBlack(out);
+                        }
+                        break;
                 }
             }
         }
