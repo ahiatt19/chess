@@ -2,7 +2,7 @@ package ui;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
+
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
@@ -32,16 +32,12 @@ public class ChessBoardUI {
     }
 
     private static void drawHeaderFooter(PrintStream out) {
-
         setBorder(out);
 
         out.print("   ");
 
-
         String[] blackHeaders = {" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
         String[] whiteHeaders = {" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h "};
-        //3 4 5 6
-        //out.print(" a   b   c  d   e  f   g   h ");
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             out.print(SMALL_EMPTY);
             drawHeaderFooter(out, whiteHeaders[boardCol]);
@@ -84,12 +80,12 @@ public class ChessBoardUI {
     private static void drawRowOfSquares(PrintStream out, int boardRow, ChessBoard chessBoard) {
         for (int squareRow = 1; squareRow <= SQUARE_SIZE_IN_PADDED_CHARS; ++squareRow) {
             for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                setWhite(out);
+                setLightPink(out);
                 int newRow = (boardRow - 9) * - 1;
                 if ((newRow + boardCol) % 2 == 0)
-                    setBlue(out);
+                    setDarkPink(out);
                 else {
-                    setWhite(out);
+                    setLightPink(out);
                 }
                 if (chessBoard.getPiece(new ChessPosition(newRow, boardCol)) == null) {
 
@@ -128,14 +124,8 @@ public class ChessBoardUI {
         }
     }
 
-    private static void setWhite(PrintStream out) {
-        //out.print(SET_BG_COLOR_WHITE);
-        out.print(SET_BG_COLOR_PINK);
-        out.print(SET_TEXT_COLOR_BLACK);
-    }
-
-    private static void setRed(PrintStream out) {
-        out.print(SET_BG_COLOR_RED);
+    private static void setLightPink(PrintStream out) {
+        out.print(SET_BG_COLOR_LIGHT_PINK);
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
@@ -144,13 +134,13 @@ public class ChessBoardUI {
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
-    private static void setBlue(PrintStream out) {
-        out.print(SET_BG_COLOR_LIGHT_BLUE);
+    private static void setDarkPink(PrintStream out) {
+        out.print(SET_BG_COLOR_DARK_PINK);
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
     private static void setBorder(PrintStream out) {
-        out.print(SET_BG_COLOR_OTHER_PINK);
+        out.print(SET_BG_COLOR_BLUE);
         out.print(SET_TEXT_COLOR_WHITE);
         out.print(SET_TEXT_BOLD);
     }
