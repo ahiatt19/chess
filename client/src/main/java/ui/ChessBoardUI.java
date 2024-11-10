@@ -33,32 +33,32 @@ public class ChessBoardUI {
 
     private static void drawHeaderFooter(PrintStream out) {
 
-        setBlack(out);
+        setBorder(out);
 
         out.print("   ");
 
 
         String[] blackHeaders = {" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
         String[] whiteHeaders = {" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h "};
+        //3 4 5 6
+        //out.print(" a   b   c  d   e  f   g   h ");
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
+            out.print(SMALL_EMPTY);
             drawHeaderFooter(out, whiteHeaders[boardCol]);
-            //out.print(EMPTY);
+            out.print(SMALL_EMPTY);
+            out.print(SMALL_EMPTY);
         }
+        out.print("   ");
+        setBlack(out);
         out.println();
     }
 
     private static void drawHeaderFooter(PrintStream out, String headerText) {
-        //out.print(" ".repeat(1));
         printHeaderText(out, headerText);
-        //out.print(" ".repeat(1));
     }
 
     private static void printHeaderText(PrintStream out, String player) {
-        setBorder(out);
-
         out.print(player);
-
-        setBlack(out);
     }
 
     private static void printRow(PrintStream out, int row) {
