@@ -1,4 +1,4 @@
-package server.login;
+package model;
 
 public class LoginRequest {
     String username;

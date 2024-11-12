@@ -1,6 +1,7 @@
 package server.login;
 
 import dataaccess.DataAccessException;
+import model.LoginRequest;
 import server.ErrorResponse;
 import spark.Request;
 import spark.Response;

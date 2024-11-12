@@ -4,6 +4,7 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
+import model.LoginRequest;
 
 
 public class ServerFacadeTests {
@@ -26,12 +27,37 @@ public class ServerFacadeTests {
         server.stop();
     }
 
+    @BeforeEach
+    void clear() throws Exception {
+        facade.clear();
+    }
+
     @Test
     void register() throws Exception {
         UserData userData = new UserData("player3", "password", "p1@email.com");
 
         var authData = facade.register(userData);
 
+        Assertions.assertTrue(authData.authToken().length() > 10);
+    }
+
+    @Test
+    void login() throws Exception {
+        register();
+
+        LoginRequest loginRequest = new LoginRequest("player3", "password");
+
+        var authData = facade.login(loginRequest);
+
+        Assertions.assertTrue(authData.authToken().length() > 10);
+    }
+
+    @Test
+    void logout() throws Exception {
+        LoginRequest loginRequest = new LoginRequest("player3", "password");
+        var authData = facade.login(loginRequest);
+
+        facade.logout(authData.authToken());
         Assertions.assertTrue(authData.authToken().length() > 10);
     }
 

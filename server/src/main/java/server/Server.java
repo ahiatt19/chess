@@ -27,6 +27,8 @@ public class Server {
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
+        System.out.println("RUN");
+
         Spark.staticFiles.location("web");
 
         // Register a user

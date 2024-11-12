@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.UserData;
+import model.LoginRequest;
 
 import java.io.*;
 import java.net.*;
@@ -17,17 +18,25 @@ public class ServerFacade {
 
     public AuthData register(UserData userData) throws Exception {
         var path = "/user";
-        System.out.println(AuthData.class);
-
         return this.makeRequest("POST", path, userData, AuthData.class);
     }
 
-    public AuthData login(UserData userData) throws Exception {
-        var path = "/user";
-        System.out.println(AuthData.class);
-
-        return this.makeRequest("POST", path, userData, AuthData.class);
+    public AuthData login(LoginRequest loginRequest) throws Exception {
+        var path = "/session";
+        return this.makeRequest("POST", path, loginRequest, AuthData.class);
     }
+
+    public void logout(String authToken) throws Exception {
+        var path = "/session";
+        this.makeRequest("DELETE", path, authToken, null);
+    }
+
+    public void clear() throws Exception {
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, null);
+    }
+
+
 
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws Exception {
