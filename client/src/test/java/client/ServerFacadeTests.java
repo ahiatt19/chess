@@ -84,4 +84,18 @@ public class ServerFacadeTests {
         System.out.println(createdGame.getGameID());
     }
 
+    @Test
+    void joinGame() throws Exception {
+        register();
+        LoginRequest loginRequest = new LoginRequest("player3", "password");
+        var authData = facade.login(loginRequest);
+
+        CreateGameRequest req = new CreateGameRequest("gameName!");
+        CreateGameResult createdGame = facade.createGame(authData.authToken(), req);
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createdGame.getGameID());
+
+        facade.joinGame(authData.authToken(), joinGameRequest);
+    }
+
 }

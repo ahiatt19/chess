@@ -1,9 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import model.AuthData;
-import model.UserData;
-import model.LoginRequest;
+import model.*;
 
 import java.io.*;
 import java.net.*;
@@ -28,8 +26,22 @@ public class ServerFacade {
 
     public void logout(String authToken) throws Exception {
         var path = "/session";
-        System.out.println("LOGOUT");
         this.makeRequest("DELETE", path, null, null, authToken);
+    }
+
+    public ListGamesResult listGames(String authToken) throws Exception {
+        var path = "/game";
+        return this.makeRequest("GET", path, null, ListGamesResult.class, authToken);
+    }
+
+    public CreateGameResult createGame(String authToken, CreateGameRequest createGame) throws Exception {
+        var path = "/game";
+        return this.makeRequest("POST", path, createGame, CreateGameResult.class, authToken);
+    }
+
+    public void joinGame(String authToken, JoinGameRequest joinGame) throws Exception {
+        var path = "/game";
+        this.makeRequest("PUT", path, joinGame, null, authToken);
     }
 
     public void clear() throws Exception {
@@ -46,7 +58,6 @@ public class ServerFacade {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
-            System.out.println("makereq: " + header);
 
             writeBody(request, http, header);
             http.connect();
@@ -59,16 +70,12 @@ public class ServerFacade {
 
     private static void writeBody(Object request, HttpURLConnection http, String header) throws IOException {
         if (request != null) {
-            System.out.println(header);
             http.addRequestProperty("Content-Type", "application/json");
             if (header != null) {
                 http.addRequestProperty("Authorization", header);
             }
-            System.out.println("properties: " + http.getRequestProperties());
             String reqData = new Gson().toJson(request);
-            System.out.println("REQDATA " + reqData);
             try (OutputStream reqBody = http.getOutputStream()) {
-                System.out.println("output stream");
                 reqBody.write(reqData.getBytes());
             }
         }
