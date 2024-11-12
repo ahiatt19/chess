@@ -1,4 +1,4 @@
-package server.creategame;
+package model;
 
 
 public class CreateGameResult {

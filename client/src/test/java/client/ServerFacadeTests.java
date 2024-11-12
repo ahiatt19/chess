@@ -1,10 +1,9 @@
 package client;
 
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
-import model.LoginRequest;
 
 
 public class ServerFacadeTests {
@@ -59,10 +58,30 @@ public class ServerFacadeTests {
         LoginRequest loginRequest = new LoginRequest("player3", "password");
         var authData = facade.login(loginRequest);
 
-        System.out.println("Test AUth: " + authData.authToken());
-
         facade.logout(authData.authToken());
         Assertions.assertTrue(authData.authToken().length() > 10);
+    }
+
+    @Test
+    void listGames() throws Exception {
+        register();
+        LoginRequest loginRequest = new LoginRequest("player3", "password");
+        var authData = facade.login(loginRequest);
+
+        ListGamesResult listGames = facade.listGames(authData.authToken());
+        System.out.println(listGames.getGames());
+    }
+
+    @Test
+    void createGame() throws Exception {
+        register();
+        LoginRequest loginRequest = new LoginRequest("player3", "password");
+        var authData = facade.login(loginRequest);
+
+        CreateGameRequest req = new CreateGameRequest("gameName!");
+
+        CreateGameResult createdGame = facade.createGame(authData.authToken(), req);
+        System.out.println(createdGame.getGameID());
     }
 
 }

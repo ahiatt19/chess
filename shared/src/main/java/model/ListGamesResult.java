@@ -1,6 +1,6 @@
-package server.listgames;
+package model;
 
-import server.listgames.ListGamesData;
+import model.ListGamesData;
 
 import java.util.ArrayList;
 
