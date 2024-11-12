@@ -54,8 +54,12 @@ public class ServerFacadeTests {
 
     @Test
     void logout() throws Exception {
+
+        register();
         LoginRequest loginRequest = new LoginRequest("player3", "password");
         var authData = facade.login(loginRequest);
+
+        System.out.println("Test AUth: " + authData.authToken());
 
         facade.logout(authData.authToken());
         Assertions.assertTrue(authData.authToken().length() > 10);
