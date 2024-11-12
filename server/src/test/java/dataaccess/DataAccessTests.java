@@ -5,7 +5,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import server.listgames.ListGamesData;
+import model.ListGamesData;
 
 import java.util.ArrayList;
 

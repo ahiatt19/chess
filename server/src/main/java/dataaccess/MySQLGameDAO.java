@@ -7,7 +7,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
-import server.listgames.ListGamesData;
+import model.ListGamesData;
 
 import java.lang.reflect.Type;
 import java.sql.ResultSet;

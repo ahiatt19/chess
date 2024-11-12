@@ -5,7 +5,7 @@ import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import server.listgames.ListGamesData;
+import model.ListGamesData;
 
 import java.util.ArrayList;
 import java.util.Objects;
