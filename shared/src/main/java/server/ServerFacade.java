@@ -12,18 +12,29 @@ public class ServerFacade {
     private final String serverUrl;
 
     public ServerFacade(String url) {
-        serverUrl = url;
+        this.serverUrl = url;
     }
 
     public AuthData register(UserData userData) throws Exception {
         var path = "/user";
+        System.out.println(AuthData.class);
+
+        return this.makeRequest("POST", path, userData, AuthData.class);
+    }
+
+    public AuthData login(UserData userData) throws Exception {
+        var path = "/user";
+        System.out.println(AuthData.class);
+
         return this.makeRequest("POST", path, userData, AuthData.class);
     }
 
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws Exception {
         try {
+            System.out.println(serverUrl + path);
             URL url = (new URI(serverUrl + path)).toURL();
+            System.out.println(url);
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
@@ -41,15 +52,17 @@ public class ServerFacade {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
             String reqData = new Gson().toJson(request);
+            System.out.println(reqData);
             try (OutputStream reqBody = http.getOutputStream()) {
+                System.out.println("output stream");
                 reqBody.write(reqData.getBytes());
             }
         }
     }
 
-    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, Exception {
+    private void throwIfNotSuccessful(HttpURLConnection http) throws Exception {
         var status = http.getResponseCode();
-        if (!isSuccessful(status)) {
+        if (status != 200) {
             throw new Exception("failure: " + status);
         }
     }
@@ -65,10 +78,5 @@ public class ServerFacade {
             }
         }
         return response;
-    }
-
-
-    private boolean isSuccessful(int status) {
-        return status / 100 == 2;
     }
 }

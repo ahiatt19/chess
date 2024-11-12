@@ -9,15 +9,15 @@ import server.ServerFacade;
 public class ServerFacadeTests {
 
     private static Server server;
-    private static ServerFacade facade;
+    static ServerFacade facade;
 
     @BeforeAll
-    public static void init() {
+    public static void startServer() {
         server = new Server();
-        var port = server.run(8080);
+        var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
 
-        var serverUrl = "http://localhost:8080";
+        var serverUrl = "http://localhost:" + port;
         facade = new ServerFacade(serverUrl);
     }
 
@@ -26,16 +26,12 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-
-    @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
-    }
-
     @Test
     void register() throws Exception {
-        UserData userData = new UserData("player1", "password", "p1@email.com");
+        UserData userData = new UserData("player3", "password", "p1@email.com");
+
         var authData = facade.register(userData);
+
         Assertions.assertTrue(authData.authToken().length() > 10);
     }
 
