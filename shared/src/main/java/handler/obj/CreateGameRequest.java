@@ -1,6 +1,4 @@
-package model;
-
-import java.util.ArrayList;
+package handler.obj;
 
 public class CreateGameRequest {
     String gameName;

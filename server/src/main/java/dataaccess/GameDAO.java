@@ -1,7 +1,7 @@
 package dataaccess;
 
 import model.GameData;
-import model.ListGamesData;
+import handler.obj.ListGamesData;
 
 import java.util.ArrayList;
 

@@ -1,34 +1,35 @@
-package server.listgames;
+package server;
 
-import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import model.ListGamesResult;
-import server.ErrorResponse;
-import service.Service;
 import spark.Request;
 import spark.Response;
+import com.google.gson.Gson;
+import service.Service;
+
+import java.util.Objects;
 
 
-public class ListGamesHandler {
+public class LogoutHandler {
     private final Service service;
 
-    public ListGamesHandler(Service service) {
+    public LogoutHandler(Service service) {
         this.service = service;
     }
 
     public Object handleRequest (Request req, Response res) {
         Gson gson = new Gson();
         try {
-            ListGamesResult result = service.listGames(req.headers("Authorization"));
+            String result = service.logout(req.headers("Authorization"));
             //bad auth token
-            if (result == null) {
+            if (Objects.equals(result, "401")) {
                 res.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));
             }
-            return gson.toJson(result);
+            return gson.toJson(new Object());
         } catch (DataAccessException e) {
             res.status(500);
             return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));
+
         }
     }
 }

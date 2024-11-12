@@ -1,10 +1,9 @@
-package server.creategame;
+package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import model.CreateGameRequest;
-import model.CreateGameResult;
-import server.ErrorResponse;
+import handler.obj.CreateGameRequest;
+import handler.obj.CreateGameResult;
 import service.Service;
 import spark.Request;
 import spark.Response;

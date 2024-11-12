@@ -1,7 +1,8 @@
-package server.register;
+package server;
 
 import dataaccess.DataAccessException;
-import server.ErrorResponse;
+import handler.obj.RegisterRequest;
+import handler.obj.RegisterResult;
 import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;

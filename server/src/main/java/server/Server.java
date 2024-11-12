@@ -1,14 +1,6 @@
 package server;
 
-import dataaccess.MemoryGameDAO;
 import dataaccess.MySQLGameDAO;
-import server.clear.ClearHandler;
-import server.login.LoginHandler;
-import server.register.RegisterHandler;
-import server.logout.LogoutHandler;
-import server.creategame.CreateGameHandler;
-import server.listgames.ListGamesHandler;
-import server.joingame.JoinGameHandler;
 import spark.*;
 import service.Service;
 

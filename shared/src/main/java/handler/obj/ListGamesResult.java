@@ -1,6 +1,4 @@
-package model;
-
-import model.ListGamesData;
+package handler.obj;
 
 import java.util.ArrayList;
 

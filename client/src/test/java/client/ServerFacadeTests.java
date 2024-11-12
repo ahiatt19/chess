@@ -1,5 +1,6 @@
 package client;
 
+import handler.obj.*;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;

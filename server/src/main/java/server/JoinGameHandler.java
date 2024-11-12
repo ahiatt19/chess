@@ -1,9 +1,8 @@
-package server.joingame;
+package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import model.JoinGameRequest;
-import server.ErrorResponse;
+import handler.obj.JoinGameRequest;
 import service.Service;
 import spark.Request;
 import spark.Response;

@@ -1,4 +1,4 @@
-package model;
+package handler.obj;
 
 public class JoinGameRequest {
     String playerColor;

@@ -1,4 +1,4 @@
-package server.register;
+package handler.obj;
 
 public class RegisterRequest {
     String username;
