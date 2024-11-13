@@ -5,6 +5,14 @@ package ui;
  */
 public class EscapeSequences {
 
+
+    private static final String ESCAPE = "\u001b[";
+
+    public static final String GREEN = ESCAPE + "32m";
+    public static final String BLUE = ESCAPE + "36m";
+    public static final String PURPLE = ESCAPE + "35m";
+    public static final String RESET = ESCAPE + "0m";
+
     private static final String UNICODE_ESCAPE = "\u001b";
     private static final String ANSI_ESCAPE = "\033";
 

@@ -1,5 +1,6 @@
 package client;
 
+import model.UserData;
 import server.ServerFacade;
 import com.google.gson.Gson;
 
@@ -9,7 +10,6 @@ public class ChessClient {
     //private String visitorName = null;
     private final ServerFacade server;
     private final String serverUrl;
-    //private State state = State.SIGNEDOUT;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -22,6 +22,7 @@ public class ChessClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
+                case "quit" -> quit();
                 case "register" -> register(params);
                 default -> help();
             };
@@ -30,11 +31,28 @@ public class ChessClient {
         }
     }
 
+    public String quit() throws Exception {
+        return "You have quit, thanks for playing!";
+    }
+
     public String register(String... params) throws Exception {
+        if (params.length >= 3) {
+            //state = State.SIGNEDIN;
+            UserData user = new UserData(params[0], params[1], params[2]);
+            server.register(user);
+            return "needs to transition to post login";
+        }
         return "we registered ho";
     }
 
     public String help() {
-        return "why are you asking for help UGH";
+        return """
+                register <USERNAME> <PASSWORD> <EMAIL>\
+                
+                login <USERNAME> <PASSWORD>\
+                
+                quit\
+                
+                help""";
     }
 }
