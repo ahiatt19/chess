@@ -7,6 +7,7 @@ import ui.ChessBoardUI;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static ui.ChessBoardUI.main;
 
@@ -77,19 +78,24 @@ public class ChessClient {
         if (params.length >= 1) {
             CreateGameRequest request = new CreateGameRequest(params[0]);
             CreateGameResult result = server.createGame(authToken, request);
-            return "Created new game: " + params[0] + ", Game ID: " + result.getGameID();
+            ArrayList<ListGamesData> arr = server.listGames(authToken).getGames();
+            int gameIndex = 0;
+            for (int i = 0; i < arr.size(); i++) {
+                if (Objects.equals(result.getGameID(), arr.get(i).gameID())) {
+                    gameIndex = i + 1;
+                }
+            }
+            return "Created new game: " + params[0] + ", Game ID: " + gameIndex;
         }
         return "Include your game name to create a game";
     }
 
     public String list() throws Exception {
         assertSignedIn();
-        ListGamesResult result = server.listGames(authToken);
-        ArrayList<ListGamesData> res = result.getGames();
+        ArrayList<ListGamesData> res = server.listGames(authToken).getGames();
         String str = "If White/Black equals 'null', the spot is open to join.";
         for (int i = 0; i < res.size(); i++) {
             str = str + "\n" + (i + 1) + ") Game Name: " + res.get(i).gameName() +
-                    "\n" + "   Game ID: " + res.get(i).gameID() +
                     "\n" + "   White: " + res.get(i).whiteUsername() +
                     "\n" + "   Black: " + res.get(i).blackUsername();
         }
@@ -99,10 +105,17 @@ public class ChessClient {
     public String play(String... params) throws Exception {
         assertSignedIn();
         if (params.length >= 2) {
-            JoinGameRequest request = new JoinGameRequest(params[0].toUpperCase(), Integer.parseInt(params[1]));
+            ArrayList<ListGamesData> arr = server.listGames(authToken).getGames();
+            int gameID = 0;
+            for (int i = 0; i < arr.size(); i++) {
+                if (Objects.equals(params[1], Integer.toString(i + 1))) {
+                    gameID = arr.get(i).gameID();
+                }
+            }
+            JoinGameRequest request = new JoinGameRequest(params[0].toUpperCase(), gameID);
             server.joinGame(authToken, request);
             main();
-            return "Joined Game ID: " + params[1] + " as " + params[0].toUpperCase();
+            return "Joined Game " + params[1] + " as " + params[0].toUpperCase();
         }
         return "Include WHITE/BLACK and a game ID in your request";
     }
@@ -110,6 +123,14 @@ public class ChessClient {
     public String observe(String... params) throws Exception {
         assertSignedIn();
         if (params.length >= 1) {
+            ListGamesResult res1 = server.listGames(authToken);
+            ArrayList<ListGamesData> arr = res1.getGames();
+            int gameID = 0;
+            for (int i = 0; i < arr.size(); i++) {
+                if (Objects.equals(params[1], Integer.toString(i + 1))) {
+                    gameID = arr.get(i).gameID();
+                }
+            }
             main();
             return "Observing Game ID: " + params[0];
         }
