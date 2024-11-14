@@ -3,9 +3,13 @@ package client;
 import handler.obj.*;
 import model.UserData;
 import server.ServerFacade;
+import ui.ChessBoardUI;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static ui.ChessBoardUI.main;
+import static ui.ChessBoardUI.printBoards;
 
 public class ChessClient {
     private final ServerFacade server;
@@ -31,6 +35,7 @@ public class ChessClient {
                 case "create" -> create(params);
                 case "list" -> list();
                 case "play" -> play(params);
+                case "observe" -> observe(params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -97,6 +102,7 @@ public class ChessClient {
         if (params.length >= 2) {
             JoinGameRequest request = new JoinGameRequest(params[0].toUpperCase(), Integer.parseInt(params[1]));
             server.joinGame(authToken, request);
+            main();
             return "Joined Game ID: " + params[1] + " as " + params[0].toUpperCase();
         }
         return "Include WHITE/BLACK and a game ID in your request";
@@ -105,6 +111,7 @@ public class ChessClient {
     public String observe(String... params) throws Exception {
         assertSignedIn();
         if (params.length >= 1) {
+            main();
             return "Observing Game ID: " + params[0];
         }
         return "Include game ID";

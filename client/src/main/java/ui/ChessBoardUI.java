@@ -15,7 +15,7 @@ public class ChessBoardUI {
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_PADDED_CHARS = 1;
 
-    public static void main(String[] args) {
+    public static void main() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         ChessBoard chessBoard = new ChessBoard();
@@ -28,6 +28,15 @@ public class ChessBoardUI {
 
 
 
+    }
+
+    public static void printBoards(ChessBoard board) {
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+
+        blackPerspective(out, board);
+        out.println();
+
+        whitePerspective(out, board);
     }
 
     private static void whitePerspective(PrintStream out, ChessBoard chessBoard) {
