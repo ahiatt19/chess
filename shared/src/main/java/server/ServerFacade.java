@@ -88,6 +88,18 @@ public class ServerFacade {
     private void throwIfNotSuccessful(HttpURLConnection http) throws Exception {
         var status = http.getResponseCode();
         if (status != 200) {
+            if (status == 400) {
+                throw new Exception("Something was typed wrong, try again");
+            }
+            else if (status == 401) {
+                throw new Exception("You are not authorized");
+            }
+            else if (status == 403) {
+                throw new Exception("Already taken");
+            }
+            else if (status == 500) {
+                throw new Exception("Error, try again");
+            }
             throw new Exception("failure: " + status);
         }
     }
