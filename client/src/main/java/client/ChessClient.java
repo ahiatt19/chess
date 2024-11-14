@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static ui.ChessBoardUI.main;
-import static ui.ChessBoardUI.printBoards;
 
 public class ChessClient {
     private final ServerFacade server;

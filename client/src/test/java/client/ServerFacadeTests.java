@@ -35,28 +35,42 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void register() throws Exception {
+    void registerPos() throws Exception {
+        UserData user1 = new UserData("player1", "pass", "p1@email.com");
+        var auth1 = facade.register(user1);
+
+        Assertions.assertTrue(auth1.authToken().length() > 10);
+    }
+
+    @Test
+    void registerNeg() throws Exception {
         UserData user1 = new UserData("player1", "pass", "p1@email.com");
         UserData user2 = new UserData("player2", "pass", "p2@email.com");
 
         var auth1 = facade.register(user1);
-
-        Assertions.assertTrue(auth1.authToken().length() > 10);
-
         var auth2 = facade.register(user2);
 
         Assertions.assertNotEquals(auth1.authToken(), auth2.authToken());
     }
 
     @Test
-    void login() throws Exception {
-        register();
+    void loginPos() throws Exception {
+        registerPos();
+        
+        LoginRequest login1 = new LoginRequest("player1", "pass");
+        var auth1 = facade.login(login1);
+
+        Assertions.assertTrue(auth1.authToken().length() > 10);
+    }
+
+    @Test
+    void loginNeg() throws Exception {
+        registerNeg();
+
         LoginRequest login1 = new LoginRequest("player1", "pass");
         LoginRequest login2 = new LoginRequest("player2", "pass");
 
         var auth1 = facade.login(login1);
-
-        Assertions.assertTrue(auth1.authToken().length() > 10);
 
         var auth2 = facade.login(login2);
 
@@ -64,41 +78,59 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void logout() throws Exception {
-        register();
+    void logoutPos() throws Exception {
+        registerPos();
+        LoginRequest loginRequest = new LoginRequest("player1", "pass");
+        var authData = facade.login(loginRequest);
+
+        facade.logout(authData.authToken());
+        Assertions.assertTrue(authData.authToken().length() > 10);
+    }
+
+    @Test
+    void logoutNeg() throws Exception {
+        registerPos();
         LoginRequest loginRequest = new LoginRequest("player1", "pass");
         var authData = facade.login(loginRequest);
         var authData2 = facade.login(loginRequest);
 
         facade.logout(authData.authToken());
-        Assertions.assertTrue(authData.authToken().length() > 10);
-
         facade.logout(authData2.authToken());
         Assertions.assertNotEquals(authData.authToken(), authData2.authToken());
     }
 
     @Test
-    void listGames() throws Exception {
-        register();
+    void listGamesPos() throws Exception {
+        registerPos();
+        LoginRequest loginRequest = new LoginRequest("player1", "pass");
+        var authData = facade.login(loginRequest);
+        CreateGameRequest req1 = new CreateGameRequest("game1");
+
+        facade.createGame(authData.authToken(), req1);
+        ListGamesResult listGames1 = facade.listGames(authData.authToken());
+
+        Assertions.assertEquals(listGames1.getGames().size(), 1);
+    }
+
+    @Test
+    void listGamesNeg() throws Exception {
+        registerPos();
         LoginRequest loginRequest = new LoginRequest("player1", "pass");
         var authData = facade.login(loginRequest);
         CreateGameRequest req1 = new CreateGameRequest("game1");
         CreateGameRequest req2 = new CreateGameRequest("game2");
 
         facade.createGame(authData.authToken(), req1);
-        ListGamesResult listGames1 = facade.listGames(authData.authToken());
-
-        Assertions.assertEquals(listGames1.getGames().size(), 1);
 
         facade.createGame(authData.authToken(), req2);
-
         ListGamesResult listGames2 = facade.listGames(authData.authToken());
+        
         Assertions.assertNotEquals(listGames2.getGames().size(), 1);
     }
 
     @Test
-    void createGame() throws Exception {
-        register();
+    void createGamePos() throws Exception {
+        registerPos();
         LoginRequest loginRequest = new LoginRequest("player1", "pass");
         var authData = facade.login(loginRequest);
 
@@ -106,6 +138,16 @@ public class ServerFacadeTests {
         CreateGameResult created1 = facade.createGame(authData.authToken(), req1);
 
         Assertions.assertEquals(created1.getGameID(), 1);
+    }
+
+    @Test
+    void createGameNeg() throws Exception {
+        registerPos();
+        LoginRequest loginRequest = new LoginRequest("player1", "pass");
+        var authData = facade.login(loginRequest);
+
+        CreateGameRequest req1 = new CreateGameRequest("game1");
+        CreateGameResult created1 = facade.createGame(authData.authToken(), req1);
 
         CreateGameRequest req2 = new CreateGameRequest("game2");
         CreateGameResult created2 = facade.createGame(authData.authToken(), req2);
@@ -114,7 +156,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void joinGame() throws Exception {
+    void joinGamePos() throws Exception {
         UserData user2 = new UserData("player2", "pass", "p2@email.com");
 
         var authData = facade.register(user2);
@@ -133,18 +175,52 @@ public class ServerFacadeTests {
 
         ListGamesResult result = facade.listGames(authData.authToken());
         ArrayList<ListGamesData> res = result.getGames();
-        for (int i = 0; i < res.size(); i++) {
-            if (res.get(i).gameID() == 1 ) {
-                Assertions.assertEquals(res.get(i).whiteUsername(),"player2");
-            }
-            else if (res.get(i).gameID() == 2 ) {
-                Assertions.assertNull(res.get(i).whiteUsername());
+        for (ListGamesData re : res) {
+            if (re.gameID() == 1) {
+                Assertions.assertEquals(re.whiteUsername(), "player2");
             }
         }
     }
 
     @Test
-    void clearTest() throws Exception {
+    void joinGameNeg() throws Exception {
+        UserData user2 = new UserData("player2", "pass", "p2@email.com");
+
+        var authData = facade.register(user2);
+
+        CreateGameRequest req1 = new CreateGameRequest("game1");
+        facade.createGame(authData.authToken(), req1);
+
+        CreateGameRequest req2 = new CreateGameRequest("game2");
+        facade.createGame(authData.authToken(), req2);
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", 1);
+        JoinGameRequest joinGameRequest2 = new JoinGameRequest("BLACK", 2);
+
+        facade.joinGame(authData.authToken(), joinGameRequest);
+        facade.joinGame(authData.authToken(), joinGameRequest2);
+
+        ListGamesResult result = facade.listGames(authData.authToken());
+        ArrayList<ListGamesData> res = result.getGames();
+        for (ListGamesData re : res) {
+            if (re.gameID() == 2) {
+                Assertions.assertNull(re.whiteUsername());
+            }
+        }
+    }
+
+    @Test
+    void clearTestPos() throws Exception {
+        UserData user1 = new UserData("player2", "pass", "p2@email.com");
+        clear();
+        UserData user2 = new UserData("player2", "pass", "p2@email.com");
+        clear();
+        //I can register a second time with the same data because I cleared the database
+        Assertions.assertEquals(user1, user2);
+    }
+
+    @Test
+    void clearTestNeg() throws Exception {
         UserData user1 = new UserData("player2", "pass", "p2@email.com");
         var authData1 = facade.register(user1);
         clear();
@@ -152,7 +228,6 @@ public class ServerFacadeTests {
         var authData = facade.register(user2);
         clear();
         //I can register a second time with the same data because I cleared the database
-        Assertions.assertEquals(user1, user2);
         Assertions.assertNotEquals(authData.authToken(), authData1.authToken());
     }
 

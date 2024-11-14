@@ -30,15 +30,6 @@ public class ChessBoardUI {
 
     }
 
-    public static void printBoards(ChessBoard board) {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-
-        blackPerspective(out, board);
-        out.println();
-
-        whitePerspective(out, board);
-    }
-
     private static void whitePerspective(PrintStream out, ChessBoard chessBoard) {
         //out.print(chessBoard);
 
@@ -122,9 +113,9 @@ public class ChessBoardUI {
     private static void drawRowOfSquares(PrintStream out, int boardRow, ChessBoard chessBoard, String perspective) {
         for (int squareRow = 1; squareRow <= SQUARE_SIZE_IN_PADDED_CHARS; ++squareRow) {
             for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                if ((boardRow + boardCol) % 2 == 0)
+                if ((boardRow + boardCol) % 2 == 0) {
                     setLightPink(out);
-                else {
+                } else {
                     setDarkPink(out);
                 }
                 int newRow = (boardRow - 9) * -1;
