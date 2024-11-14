@@ -95,11 +95,19 @@ public class ChessClient {
     public String play(String... params) throws Exception {
         assertSignedIn();
         if (params.length >= 2) {
-            JoinGameRequest request = new JoinGameRequest(params[0], Integer.parseInt(params[1]));
+            JoinGameRequest request = new JoinGameRequest(params[0].toUpperCase(), Integer.parseInt(params[1]));
             server.joinGame(authToken, request);
-            return "Joined Game ID: " + params[1] + " as " + params[0];
+            return "Joined Game ID: " + params[1] + " as " + params[0].toUpperCase();
         }
         return "Include WHITE/BLACK and a game ID in your request";
+    }
+
+    public String observe(String... params) throws Exception {
+        assertSignedIn();
+        if (params.length >= 1) {
+            return "Observing Game ID: " + params[0];
+        }
+        return "Include game ID";
     }
 
     public String help() {
@@ -113,7 +121,7 @@ public class ChessClient {
                     
                     play <COLOR> <GAME_ID> -- Play a Game\
                     
-                    observe -- Watch a game\
+                    observe <GAME_ID> -- Watch a game\
                     
                     help -- Display Options""";
         } else {
