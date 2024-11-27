@@ -1,5 +1,7 @@
 package client;
 
+import client.websocket.ServerMessageHandler;
+import client.websocket.WebSocketFacade;
 import handler.obj.*;
 import model.UserData;
 import server.ServerFacade;
@@ -14,12 +16,14 @@ import static ui.ChessBoardUI.main;
 public class ChessClient {
     private final ServerFacade server;
     private final String serverUrl;
+    private final ServerMessageHandler handler;
     private State state = State.SIGNEDOUT;
     private String authToken;
 
-    public ChessClient(String serverUrl) {
+    public ChessClient(String serverUrl, ServerMessageHandler handler) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.handler = handler;
     }
 
     public String evaluateInput(String input) {
@@ -115,6 +119,8 @@ public class ChessClient {
             JoinGameRequest request = new JoinGameRequest(params[0].toUpperCase(), gameID);
             server.joinGame(authToken, request);
             main();
+            var ws = new WebSocketFacade(serverUrl, handler);
+            ws.joinGame(authToken, params[0].toUpperCase());
             return "Joined Game " + params[1] + " as " + params[0].toUpperCase();
         }
         return "Include WHITE/BLACK and a game ID in your request";
@@ -127,7 +133,7 @@ public class ChessClient {
             ArrayList<ListGamesData> arr = res1.getGames();
             int gameID = 0;
             for (int i = 0; i < arr.size(); i++) {
-                if (Objects.equals(params[1], Integer.toString(i + 1))) {
+                if (Objects.equals(params[0], Integer.toString(i + 1))) {
                     gameID = arr.get(i).gameID();
                 }
             }
@@ -168,4 +174,8 @@ public class ChessClient {
             throw new Exception("You must sign in");
         }
     }
+
+    //websocket stuff
+    // public void notfiy()
+
 }
