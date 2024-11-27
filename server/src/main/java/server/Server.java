@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.MySQLGameDAO;
+import server.websocket.WebSocketHandler;
 import spark.*;
 import service.Service;
 
@@ -14,12 +15,15 @@ public class Server {
     ListGamesHandler listGamesHandler = new ListGamesHandler(service);
     JoinGameHandler joinGameHandler = new JoinGameHandler(service);
     ClearHandler clearHandler = new ClearHandler(service);
+    WebSocketHandler webSocketHandler = new WebSocketHandler(service);
 
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/ws", webSocketHandler);
 
         // Register a user
         Spark.post("/user", (req, res) -> registerHandler.handleRequest(req, res));

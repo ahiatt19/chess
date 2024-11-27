@@ -113,4 +113,10 @@ public class Service {
         userDataAccess.clearUsers();
         gameDataAccess.clearGames();
     }
+
+    //Creating for phase six to get the username
+    public String getUsername(String authToken) throws DataAccessException {
+        AuthData authData = authDataAccess.getAuth(authToken);
+        return authData.username();
+    }
 }
