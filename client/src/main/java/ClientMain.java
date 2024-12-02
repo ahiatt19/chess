@@ -1,5 +1,3 @@
-import chess.*;
-
 import client.Repl;
 
 public class ClientMain {
@@ -8,7 +6,6 @@ public class ClientMain {
         if (args.length == 1) {
             serverUrl = args[0];
         }
-
         new Repl(serverUrl).run();
     }
 }

@@ -1,14 +1,20 @@
 package client;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import client.websocket.ServerMessageHandler;
 import client.websocket.WebSocketFacade;
 import handler.obj.*;
 import model.UserData;
 import server.ServerFacade;
-import ui.ChessBoardUI;
+import ui.GamePlayUI;
+import ui.UserType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 
 import static ui.ChessBoardUI.main;
@@ -18,7 +24,9 @@ public class ChessClient {
     private final String serverUrl;
     private final ServerMessageHandler handler;
     private State state = State.SIGNEDOUT;
+    private boolean inGameplay = false;
     private String authToken;
+    private GamePlayUI gamePlayUI = new GamePlayUI();
 
     public ChessClient(String serverUrl, ServerMessageHandler handler) {
         server = new ServerFacade(serverUrl);
@@ -40,6 +48,10 @@ public class ChessClient {
                 case "list" -> list();
                 case "play" -> play(params);
                 case "observe" -> observe(params);
+                case "redraw" -> redraw();
+                case "leave" -> leave();
+                case "resign" -> resign();
+                case "highlight" -> highlight(params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -118,7 +130,13 @@ public class ChessClient {
             }
             JoinGameRequest request = new JoinGameRequest(params[0].toUpperCase(), gameID);
             server.joinGame(authToken, request);
-            main();
+
+            gamePlayUI.setVars(gameID, params[1], params[0].toUpperCase(), UserType.PLAYER);
+            inGameplay = true;
+
+            ChessBoard chessBoard = new ChessBoard();
+            chessBoard.resetBoard();
+            main(gamePlayUI.getPlayerColor(), chessBoard, null);
             var ws = new WebSocketFacade(serverUrl, handler);
             ws.joinGame(authToken, params[0].toUpperCase());
             return "Joined Game " + params[1] + " as " + params[0].toUpperCase();
@@ -137,31 +155,124 @@ public class ChessClient {
                     gameID = arr.get(i).gameID();
                 }
             }
-            main();
+            inGameplay = true;
+            gamePlayUI.setVars(gameID, params[0], "WHITE", UserType.OBSERVER);
+            ChessBoard chessBoard = new ChessBoard();
+            chessBoard.resetBoard();
+            main("WHITE", chessBoard, null);
             return "Observing Game ID: " + params[0];
         }
         return "Include game ID";
     }
 
+    public String redraw() throws Exception {
+        assertSignedIn();
+        assertInGameplay();
+        // server.getChessBoard()
+        ChessBoard chessBoard = new ChessBoard();
+        chessBoard.resetBoard();
+        main(gamePlayUI.getPlayerColor(), chessBoard, null);
+        return "Here is the current game state.";
+    }
+
+    public String leave() throws Exception {
+        assertSignedIn();
+        assertInGameplay();
+        inGameplay = false;
+        String gameID = gamePlayUI.getUserGameID();
+        gamePlayUI = new GamePlayUI();
+        return "You have left game " + gameID;
+    }
+
+    public String resign() throws Exception {
+        assertSignedIn();
+        assertInGameplay();
+        assertPlayer();
+
+
+        // change the player to an observer so they can only look at the game now
+        String gameID = gamePlayUI.getUserGameID();
+        gamePlayUI.setVars(gamePlayUI.getGameID(), gamePlayUI.getUserGameID(), gamePlayUI.getPlayerColor(), UserType.OBSERVER);
+        return "You have resigned from game " + gameID;
+    }
+
+    public String highlight(String... params) throws Exception {
+        assertSignedIn();
+        assertInGameplay();
+        assertPlayer();
+        String numRegex = "^[1-9]$";
+        String letRegex = "^[a-hA-H]$";
+        if (params.length >= 2 && params[0].matches(numRegex) && params[1].matches(letRegex)) {
+            int row = Integer.parseInt(params[0]);
+            int col = switch (params[1].toUpperCase()) {
+                case "A" -> 1;
+                case "B" -> 2;
+                case "C" -> 3;
+                case "D" -> 4;
+                case "E" -> 5;
+                case "F" -> 6;
+                case "G" -> 7;
+                case "H" -> 8;
+                default -> 0;
+            };
+            ChessPosition pos = new ChessPosition(row, col);
+            ChessGame chessGame = new ChessGame();
+            Collection<ChessMove> moves = chessGame.validMoves(pos);
+
+            main(gamePlayUI.getPlayerColor(), chessGame.getBoard(), moves);
+
+            return "Possible Moves for " + params[0] + " " + params[1];
+        }
+        return "The Coordinates are Not Valid";
+    }
+
+
     public String help() {
         if (state == State.SIGNEDIN) {
-            return """
-                    logout -- Logout of Chess\
-                    
+            if (inGameplay) {
+                if (gamePlayUI.getUserType() == UserType.OBSERVER) {
+                    return """
+                            redraw -- Redraws Chess Board\
+                            
+                            leave -- Leave the Game\
+                            
+                            help -- Display Options""";
+                }
+                if (gamePlayUI.getUserType() == UserType.PLAYER) {
+                    return """
+                            move <1-8> <a-b> -- Make a Move\
+                            
+                            highlight <1-8> <a-b> -- Highlight Possible Moves for a Piece\
+                            
+                            redraw -- Redraws Chess Board\
+                            
+                            leave -- Leave the Game\
+                            
+                            resign -- Forfeit the Game\
+                            
+                            help -- Display Options""";
+                } else {
+                    return "There is an error with your user type";
+                }
+            } else {
+                return """
                     create <GAME_NAME> -- Create a New Game\
                     
                     list -- List all the Games\
                     
                     play <COLOR> <GAME_ID> -- Play a Game\
                     
-                    observe <GAME_ID> -- Watch a game\
+                    observe <GAME_ID> -- Watch a Game\
+                    
+                    logout -- Logout of Chess\
                     
                     help -- Display Options""";
+            }
         } else {
             return """
-                    register <USERNAME> <PASSWORD> <EMAIL> -- Register a new account\
+                    register <USERNAME> <PASSWORD> <EMAIL> -- Register a New Account\
                     
-                    login <USERNAME> <PASSWORD> -- Login to account\
+                    login <USERNAME> <PASSWORD> -- Login to Account\
                     
                     quit -- Quit Chess\
                     
@@ -175,7 +286,15 @@ public class ChessClient {
         }
     }
 
-    //websocket stuff
-    // public void notfiy()
+    private void assertInGameplay() throws Exception {
+        if (!inGameplay) {
+            throw new Exception("You must join a game");
+        }
+    }
 
+    private void assertPlayer() throws Exception {
+        if (gamePlayUI.getUserType() != UserType.PLAYER) {
+            throw new Exception("You must be a player to resign");
+        }
+    }
 }
