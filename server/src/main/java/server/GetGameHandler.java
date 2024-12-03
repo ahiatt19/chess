@@ -24,16 +24,11 @@ public class GetGameHandler {
             int gameID = Integer.parseInt(req.queryParams("gameID"));
             GameData gameData = service.getGame(req.headers("Authorization"), gameID);
 
-            System.out.println("In Get Game Handler");
-            System.out.println(gameData);
-            System.out.println("Gson to Json");
-
             var gsonBuilder = new GsonBuilder();
             gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());
             var serializer = gsonBuilder.create();
 
             var chessGameString = serializer.toJson(gameData);
-            System.out.println(chessGameString);
             //bad auth token
             if (gameData == null) {
                 res.status(401);

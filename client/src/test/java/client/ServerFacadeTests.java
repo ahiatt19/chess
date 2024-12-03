@@ -176,9 +176,6 @@ public class ServerFacadeTests {
 
         GameData gameData2 = facade.getGame(authData.authToken(), created1.getGameID());
 
-        System.out.println("In Facade Tests");
-        System.out.println(gameData2.game());
-
         Assertions.assertEquals(gameData2.game(), gameData.game());
     }
 

@@ -136,8 +136,6 @@ public class ServerFacade {
                         Gson serializer = createSerializer();
 
                         response = serializer.fromJson(reader, responseClass);
-                        System.out.println("response");
-                        System.out.println(response);
                     } else {
                         response = new Gson().fromJson(reader, responseClass);
                     }
