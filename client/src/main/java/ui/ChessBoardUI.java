@@ -14,34 +14,34 @@ public class ChessBoardUI {
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_PADDED_CHARS = 1;
 
-    public static void main(String perspective, ChessBoard chessBoard, Collection<ChessMove> highlight) {
+    public static void main(String perspective, ChessBoard chessBoard, Collection<ChessMove> highlight, ChessPosition start) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
 
         if (Objects.equals(perspective, "BLACK")) {
-            blackPerspective(out, chessBoard, highlight);
+            blackPerspective(out, chessBoard, highlight, start);
             // out.println();
         }
         if (Objects.equals(perspective, "WHITE")) {
-            whitePerspective(out, chessBoard, highlight);
+            whitePerspective(out, chessBoard, highlight, start);
             // out.println();
         }
     }
 
-    private static void whitePerspective(PrintStream out, ChessBoard chessBoard, Collection<ChessMove> highlight) {
+    private static void whitePerspective(PrintStream out, ChessBoard chessBoard, Collection<ChessMove> highlight, ChessPosition start) {
         String[] whiteHeaders = {" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h "};
         drawHeaderFooter(out, whiteHeaders);
 
-        drawChessBoard(out, chessBoard, "white", highlight);
+        drawChessBoard(out, chessBoard, "white", highlight, start);
 
         drawHeaderFooter(out, whiteHeaders);
     }
 
-    private static void blackPerspective(PrintStream out, ChessBoard chessBoard, Collection<ChessMove> highlight) {
+    private static void blackPerspective(PrintStream out, ChessBoard chessBoard, Collection<ChessMove> highlight, ChessPosition start) {
         String[] blackHeaders = {" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
         drawHeaderFooter(out, blackHeaders);
 
-        drawChessBoard(out, chessBoard, "black", highlight);
+        drawChessBoard(out, chessBoard, "black", highlight, start);
 
         drawHeaderFooter(out, blackHeaders);
     }
@@ -80,14 +80,14 @@ public class ChessBoardUI {
         setBlack(out);
     }
 
-    private static void drawChessBoard(PrintStream out, ChessBoard chessBoard, String perspective, Collection<ChessMove> highlight) {
+    private static void drawChessBoard(PrintStream out, ChessBoard chessBoard, String perspective, Collection<ChessMove> highlight, ChessPosition start) {
         switch (perspective) {
             case "white":
                 for (int boardRow = 1; boardRow <= BOARD_SIZE_IN_SQUARES; ++boardRow) {
                     int actualRow = (boardRow - 9) * -1;
                     printRow(out, actualRow);
 
-                    drawRowOfSquares(out, boardRow, chessBoard, "white", highlight);
+                    drawRowOfSquares(out, boardRow, chessBoard, "white", highlight, start);
                     printRow(out, actualRow);
                     out.println();
                 }
@@ -97,7 +97,7 @@ public class ChessBoardUI {
 
                     printRow(out, boardRow);
 
-                    drawRowOfSquares(out, boardRow, chessBoard, "black", highlight);
+                    drawRowOfSquares(out, boardRow, chessBoard, "black", highlight, start);
                     printRow(out, boardRow);
                     out.println();
                 }
@@ -106,7 +106,7 @@ public class ChessBoardUI {
 
     }
 
-    private static void drawRowOfSquares(PrintStream out, int boardRow, ChessBoard chessBoard, String perspective, Collection<ChessMove> highlight) {
+    private static void drawRowOfSquares(PrintStream out, int boardRow, ChessBoard chessBoard, String perspective, Collection<ChessMove> highlight, ChessPosition start) {
         for (int squareRow = 1; squareRow <= SQUARE_SIZE_IN_PADDED_CHARS; ++squareRow) {
             for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
                 if ((boardRow + boardCol) % 2 == 0) {
@@ -115,10 +115,9 @@ public class ChessBoardUI {
                     setDarkPink(out);
                 }
                 if (highlight != null) {
-                    ChessPosition startPosition = new ChessPosition(0, 0);
+                    ChessPosition startPosition = start;
                     //highlight the next positions
                     for (ChessMove move : highlight) {
-                        startPosition = move.getStartPosition();
                         int moveRow = move.getEndPosition().getRow();
                         int moveCol = move.getEndPosition().getColumn();
                         if (Objects.equals(perspective, "white")) {

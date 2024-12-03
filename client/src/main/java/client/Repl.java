@@ -26,7 +26,6 @@ public class Repl implements ServerMessageHandler {
         while (!result.equals("quit")) {
             printPrompt();
             String line = scanner.nextLine();
-
             try {
                 result = client.evaluateInput(line);
                 System.out.print(BLUE + result);

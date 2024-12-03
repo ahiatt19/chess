@@ -137,7 +137,7 @@ public class ChessGame {
             }
             if (goodMove) {
                 if (game.getPiece(move.getStartPosition()).getTeamColor() != currentTeamTurn) {
-                    throw new chess.InvalidMoveException("INVALID");
+                    throw new chess.InvalidMoveException("It is " + currentTeamTurn + "'s turn");
                 }
                 else if (game.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
                     game.addPiece(move.getEndPosition(),
@@ -149,7 +149,7 @@ public class ChessGame {
             }
             else {throw new chess.InvalidMoveException("INVALID");}
         } catch (NullPointerException n) {
-            throw new chess.InvalidMoveException("INVALID");
+            throw new chess.InvalidMoveException("Invalid Move");
         }
     }
     /**
@@ -165,6 +165,10 @@ public class ChessGame {
             }
         }
         return positions;
+    }
+
+    public boolean getChessPiece(ChessPosition pos) {
+        return game.getPiece(pos) != null;
     }
 
     /**

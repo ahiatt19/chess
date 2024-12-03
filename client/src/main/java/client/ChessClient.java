@@ -52,6 +52,7 @@ public class ChessClient {
                 case "leave" -> leave();
                 case "resign" -> resign();
                 case "highlight" -> highlight(params);
+                case "move" -> move(params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -136,7 +137,7 @@ public class ChessClient {
 
             ChessBoard chessBoard = new ChessBoard();
             chessBoard.resetBoard();
-            main(gamePlayUI.getPlayerColor(), chessBoard, null);
+            main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
             var ws = new WebSocketFacade(serverUrl, handler);
             ws.joinGame(authToken, params[0].toUpperCase());
             return "Joined Game " + params[1] + " as " + params[0].toUpperCase();
@@ -159,7 +160,7 @@ public class ChessClient {
             gamePlayUI.setVars(gameID, params[0], "WHITE", UserType.OBSERVER);
             ChessBoard chessBoard = new ChessBoard();
             chessBoard.resetBoard();
-            main("WHITE", chessBoard, null);
+            main("WHITE", chessBoard, null, null);
             return "Observing Game ID: " + params[0];
         }
         return "Include game ID";
@@ -171,7 +172,7 @@ public class ChessClient {
         // server.getChessBoard()
         ChessBoard chessBoard = new ChessBoard();
         chessBoard.resetBoard();
-        main(gamePlayUI.getPlayerColor(), chessBoard, null);
+        main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
         return "Here is the current game state.";
     }
 
@@ -200,32 +201,67 @@ public class ChessClient {
         assertSignedIn();
         assertInGameplay();
         assertPlayer();
-        String numRegex = "^[1-9]$";
-        String letRegex = "^[a-hA-H]$";
-        if (params.length >= 2 && params[0].matches(numRegex) && params[1].matches(letRegex)) {
-            int row = Integer.parseInt(params[0]);
-            int col = switch (params[1].toUpperCase()) {
-                case "A" -> 1;
-                case "B" -> 2;
-                case "C" -> 3;
-                case "D" -> 4;
-                case "E" -> 5;
-                case "F" -> 6;
-                case "G" -> 7;
-                case "H" -> 8;
-                default -> 0;
-            };
-            ChessPosition pos = new ChessPosition(row, col);
-            ChessGame chessGame = new ChessGame();
-            Collection<ChessMove> moves = chessGame.validMoves(pos);
+        if (params.length >= 1) {
+            String num = params[0].substring(0, 1);
+            String let = params[0].substring(1, 2);
+            String numRegex = "^[1-9]$";
+            String letRegex = "^[a-hA-H]$";
+            if (num.matches(numRegex) && let.matches(letRegex)) {
+                int row = Integer.parseInt(num);
+                int col = letterCoor(let.toUpperCase());
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessGame chessGame = new ChessGame();
+                if (chessGame.getChessPiece(pos)) {
+                    Collection<ChessMove> moves = chessGame.validMoves(pos);
+                    main(gamePlayUI.getPlayerColor(), chessGame.getBoard(), moves, pos);
 
-            main(gamePlayUI.getPlayerColor(), chessGame.getBoard(), moves);
-
-            return "Possible Moves for " + params[0] + " " + params[1];
+                    return "Possible Moves for " + params[0];
+                } else {
+                    return "There is not a Piece at " + params[0];
+                }
+            }
         }
         return "The Coordinates are Not Valid";
     }
 
+    public String move(String... params) throws Exception {
+        assertSignedIn();
+        assertInGameplay();
+        assertPlayer();
+        if (params.length >= 2) {
+            String numRegex = "^[1-9]$";
+            String letRegex = "^[a-hA-H]$";
+            String startNum = params[0].substring(0, 1);
+            String startLet = params[0].substring(1, 2);
+            String endNum = params[1].substring(0, 1);
+            String endLet = params[1].substring(1, 2);
+            if (startNum.matches(numRegex) && endNum.matches(numRegex) && startLet.matches(letRegex) && endLet.matches(letRegex)) {
+                ChessPosition startPos = new ChessPosition(Integer.parseInt(startNum), letterCoor(startLet.toUpperCase()));
+                ChessPosition endPos = new ChessPosition(Integer.parseInt(endNum), letterCoor(endLet.toUpperCase()));
+                ChessGame chessGame = new ChessGame();
+                chessGame.makeMove(new ChessMove(startPos, endPos, null));
+
+                main(gamePlayUI.getPlayerColor(), chessGame.getBoard(), null, null);
+
+                return "Made the move " + params[0] + " -> " + params[1];
+            }
+        }
+        return "The Coordinates are Not Valid";
+    }
+
+    public int letterCoor(String letter) {
+        return switch (letter) {
+            case "A" -> 1;
+            case "B" -> 2;
+            case "C" -> 3;
+            case "D" -> 4;
+            case "E" -> 5;
+            case "F" -> 6;
+            case "G" -> 7;
+            case "H" -> 8;
+            default -> throw new IllegalStateException("Unexpected coordinate: " + letter);
+        };
+    }
 
     public String help() {
         if (state == State.SIGNEDIN) {
