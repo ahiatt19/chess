@@ -14,8 +14,12 @@ public class Server {
     CreateGameHandler createGameHandler = new CreateGameHandler(service);
     ListGamesHandler listGamesHandler = new ListGamesHandler(service);
     JoinGameHandler joinGameHandler = new JoinGameHandler(service);
+    GetGameHandler getGameHandler = new GetGameHandler(service);
+    UpdateGameHandler updateGameHandler = new UpdateGameHandler(service);
     ClearHandler clearHandler = new ClearHandler(service);
     WebSocketHandler webSocketHandler = new WebSocketHandler(service);
+
+
 
 
     public int run(int desiredPort) {
@@ -37,6 +41,10 @@ public class Server {
         Spark.post("/game", (req, res) -> createGameHandler.handleRequest(req, res));
         //Join a Chess Game
         Spark.put("/game", (req, res) -> joinGameHandler.handleRequest(req, res));
+        //Get a Chess Game in the DB
+        Spark.get("/chess", (req, res) -> getGameHandler.handleRequest(req, res));
+        //Update a Chess Game
+        Spark.put("/update", (req, res) -> updateGameHandler.handleRequest(req, res));
         //Clear ALL data from the database
         Spark.delete("/db", (req, res) -> clearHandler.handleRequest(res));
 

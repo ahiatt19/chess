@@ -194,7 +194,7 @@ public class DataAccessTests {
         ChessGame game = dataAccess.getGame(gameID).game();
         game.makeMove(new ChessMove(new ChessPosition(2, 1), new ChessPosition(4, 1), null));
 
-        dataAccess.updateGame(new GameData(gameID, "FIRST", "SECOND", "FirstGameWHAT!!", game));
+        dataAccess.joinGame(new GameData(gameID, "FIRST", "SECOND", "FirstGameWHAT!!", game));
 
         Assertions.assertEquals(new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN),
                 dataAccess.getGame(gameID).game().getBoard().getPiece(new ChessPosition(4, 1)));
@@ -207,7 +207,7 @@ public class DataAccessTests {
     public void updateBadGameTest() throws DataAccessException {
         //WHITE MOVE PAWN
         GameData game = dataAccess.getGame(0);
-        dataAccess.updateGame(new GameData(0, "FIRST", "SECOND", "FirstGameWHAT!!", new ChessGame()));
+        dataAccess.joinGame(new GameData(0, "FIRST", "SECOND", "FirstGameWHAT!!", new ChessGame()));
 
         Assertions.assertNull(game);
 

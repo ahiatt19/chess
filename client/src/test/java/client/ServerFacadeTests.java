@@ -1,5 +1,8 @@
 package client;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import handler.obj.*;
 import model.*;
 import org.junit.jupiter.api.*;
@@ -138,6 +141,45 @@ public class ServerFacadeTests {
         CreateGameResult created1 = facade.createGame(authData.authToken(), req1);
 
         Assertions.assertEquals(created1.getGameID(), 1);
+    }
+
+    @Test
+    void getGameTest() throws Exception {
+        registerPos();
+        LoginRequest loginRequest = new LoginRequest("player1", "pass");
+        var authData = facade.login(loginRequest);
+
+        CreateGameRequest req1 = new CreateGameRequest("game1");
+        CreateGameResult created1 = facade.createGame(authData.authToken(), req1);
+
+        var game = facade.getGame(authData.authToken(), created1.getGameID());
+
+        System.out.println(game);
+
+        Assertions.assertEquals(created1.getGameID(), 1);
+    }
+
+    @Test
+    void updateGameTest() throws Exception {
+        registerPos();
+        LoginRequest loginRequest = new LoginRequest("player1", "pass");
+        AuthData authData = facade.login(loginRequest);
+
+        CreateGameRequest req1 = new CreateGameRequest("game1");
+        CreateGameResult created1 = facade.createGame(authData.authToken(), req1);
+
+        GameData gameData = facade.getGame(authData.authToken(), created1.getGameID());
+
+        gameData.game().makeMove(new ChessMove(new ChessPosition(2, 2), new ChessPosition(3, 2), null));
+
+        facade.updateGame(authData.authToken(), created1.getGameID(), gameData.game());
+
+        GameData gameData2 = facade.getGame(authData.authToken(), created1.getGameID());
+
+        System.out.println("In Facade Tests");
+        System.out.println(gameData2.game());
+
+        Assertions.assertEquals(gameData2.game(), gameData.game());
     }
 
     @Test

@@ -220,8 +220,8 @@ public class ServiceTests {
         JoinGameRequest joinGameRequest2 = new JoinGameRequest("BLACK", createGameResult.getGameID());
 
         //add users to game
-        service.updateGame(regResult1.getAuthToken(), joinGameRequest1);
-        service.updateGame(regResult2.getAuthToken(), joinGameRequest2);
+        service.joinGame(regResult1.getAuthToken(), joinGameRequest1);
+        service.joinGame(regResult2.getAuthToken(), joinGameRequest2);
 
         //Check that the users are correctly in memory in the game Data
         Assertions.assertEquals("OtherUser67", dataAccess.getGame(createGameResult.getGameID()).blackUsername());
@@ -244,8 +244,8 @@ public class ServiceTests {
         JoinGameRequest joinGameRequest2 = new JoinGameRequest("WHITE", createGameResult.getGameID());
 
         //add users to game
-        service.updateGame(regResult1.getAuthToken(), joinGameRequest1);
-        service.updateGame(regResult2.getAuthToken(), joinGameRequest2);
+        service.joinGame(regResult1.getAuthToken(), joinGameRequest1);
+        service.joinGame(regResult2.getAuthToken(), joinGameRequest2);
 
         //Check that only First User is white and black is null
         Assertions.assertNotEquals("OtherUser67", dataAccess.getGame(createGameResult.getGameID()).whiteUsername());

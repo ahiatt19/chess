@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import handler.obj.UpdateGameRequest;
 import model.GameData;
 import handler.obj.ListGamesData;
 
@@ -12,7 +14,9 @@ public interface GameDAO {
 
     GameData getGame(int gameID) throws DataAccessException ;
 
-    void updateGame(GameData gameData) throws DataAccessException ;
+    void joinGame(GameData gameData) throws DataAccessException ;
+
+    void updateGame(int gameID, ChessGame game) throws DataAccessException;
 
     void clearGames() throws DataAccessException ;
 }

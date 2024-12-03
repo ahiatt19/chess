@@ -21,7 +21,7 @@ public class JoinGameHandler {
         try {
             JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
             //My service updateGame function returns strings that I compare for the response
-            String result = service.updateGame(req.headers("Authorization"), request);
+            String result = service.joinGame(req.headers("Authorization"), request);
             //bad request
             if (Objects.equals(result, "400")) {
                 res.status(400);

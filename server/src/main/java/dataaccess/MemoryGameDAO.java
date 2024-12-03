@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 
+import handler.obj.UpdateGameRequest;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -112,7 +113,7 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
     }
 
 
-    public void updateGame(GameData gameData) {
+    public void joinGame(GameData gameData) {
         int i = 0;
         while (i < currentGames.size()) {
             if (Objects.equals(currentGames.get(i).gameID(), gameData.gameID())) {
@@ -121,6 +122,11 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
             i++;
         }
     }
+
+    public void updateGame(int gameID, ChessGame game) {
+        return;
+    }
+
 
     //Created for testing
     public int userSize() {

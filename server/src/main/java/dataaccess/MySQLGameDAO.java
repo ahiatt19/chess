@@ -3,6 +3,7 @@ package dataaccess;
 import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.*;
+import handler.obj.UpdateGameRequest;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -260,7 +261,7 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
     }
 
 
-    public void updateGame(GameData gameData) throws DataAccessException {
+    public void joinGame(GameData gameData) throws DataAccessException {
         var sql = "UPDATE games SET white_username=?, black_username=?, game=? WHERE gameID=?";
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(sql)) {
@@ -274,6 +275,25 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                 var chessGameString = serializer.toJson(gameData.game());
                 ps.setString(3, chessGameString);
                 ps.setInt(4, gameData.gameID());
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", sql, e.getMessage()));
+        }
+    }
+
+
+    public void updateGame(int gameID, ChessGame chessGame) throws DataAccessException {
+        var sql = "UPDATE games SET game=? WHERE gameID=?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(sql)) {
+                var gsonBuilder = new GsonBuilder();
+                gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());
+                var serializer = gsonBuilder.create();
+
+                var chessGameString = serializer.toJson(chessGame);
+                ps.setString(1, chessGameString);
+                ps.setInt(2, gameID);
                 ps.executeUpdate();
             }
         } catch (SQLException e) {

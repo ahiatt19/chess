@@ -1,10 +1,13 @@
 package server;
 
-import com.google.gson.Gson;
+import chess.ChessBoard;
+import chess.ChessGame;
+import com.google.gson.*;
 import handler.obj.*;
 import model.*;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.*;
 
 public class ServerFacade {
@@ -50,6 +53,16 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, null, null);
     }
 
+    public GameData getGame(String authToken, int gameID) throws Exception {
+        var path = "/chess?gameID=" + gameID;
+        return this.makeRequest("GET", path, null, GameData.class, authToken);
+    }
+
+    public void updateGame(String authToken, int gameID, ChessGame game) throws Exception {
+        var path = "/update?gameID=" + gameID;
+        this.makeRequest("PUT", path, game, null, authToken);
+    }
+
 
 
 
@@ -69,13 +82,22 @@ public class ServerFacade {
         }
     }
 
-    private static void writeBody(Object request, HttpURLConnection http, String header) throws IOException {
+    private void writeBody(Object request, HttpURLConnection http, String header) throws IOException {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
             if (header != null) {
                 http.addRequestProperty("Authorization", header);
             }
             String reqData = new Gson().toJson(request);
+            if (request.getClass() == ChessGame.class) {
+                var gsonBuilder = new GsonBuilder();
+                gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());
+                var serializer = gsonBuilder.create();
+
+                reqData = serializer.toJson(request);
+
+                // reqData = new Gson().toJson(request, UpdateGameRequest.class);
+            }
             try (OutputStream reqBody = http.getOutputStream()) {
                 reqBody.write(reqData.getBytes());
             }
@@ -110,10 +132,59 @@ public class ServerFacade {
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseClass != null) {
-                    response = new Gson().fromJson(reader, responseClass);
+                    if (responseClass == GameData.class) {
+                        Gson serializer = createSerializer();
+
+                        response = serializer.fromJson(reader, responseClass);
+                        System.out.println("response");
+                        System.out.println(response);
+                    } else {
+                        response = new Gson().fromJson(reader, responseClass);
+                    }
                 }
             }
         }
         return response;
+    }
+
+    public class ChessGameSerializer implements JsonSerializer<ChessGame> {
+        @Override
+        public JsonElement serialize(ChessGame chessGame, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject jsonObject = new JsonObject();
+
+            // Serialize the current team turn
+            jsonObject.addProperty("currentTeamTurn", chessGame.getTeamTurn().toString());
+
+            // Serialize the chess board (game)
+            JsonElement boardJson = context.serialize(chessGame.getBoard());
+            jsonObject.add("game", boardJson);
+
+            return jsonObject;
+        }
+    }
+
+    public static Gson createSerializer() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+
+        // Register the ChessGame deserializer
+        gsonBuilder.registerTypeAdapter(ChessGame.class, new JsonDeserializer<ChessGame>() {
+            @Override
+            public ChessGame deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                JsonObject jsonObject = json.getAsJsonObject();
+
+                // Deserialize ChessBoard from the JSON
+                ChessBoard chessBoard = context.deserialize(jsonObject.get("game"), ChessBoard.class);
+                ChessGame game = new ChessGame();
+                game.setBoard(chessBoard);
+
+                if (jsonObject.has("currentTeamTurn")) {
+                    String currentTurn = jsonObject.get("currentTeamTurn").getAsString();
+                    game.setTeamTurn(ChessGame.TeamColor.valueOf(currentTurn));
+                }
+
+                return game;
+            }
+        });
+        return gsonBuilder.create();
     }
 }

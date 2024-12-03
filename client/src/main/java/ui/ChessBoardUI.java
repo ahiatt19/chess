@@ -17,14 +17,11 @@ public class ChessBoardUI {
     public static void main(String perspective, ChessBoard chessBoard, Collection<ChessMove> highlight, ChessPosition start) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
-
         if (Objects.equals(perspective, "BLACK")) {
             blackPerspective(out, chessBoard, highlight, start);
-            // out.println();
         }
         if (Objects.equals(perspective, "WHITE")) {
             whitePerspective(out, chessBoard, highlight, start);
-            // out.println();
         }
     }
 

@@ -1,16 +1,11 @@
 package service;
+import chess.ChessGame;
 import dataaccess.*;
+import handler.obj.*;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
 import org.mindrot.jbcrypt.BCrypt;
-import handler.obj.CreateGameResult;
-import handler.obj.JoinGameRequest;
-import handler.obj.ListGamesResult;
-import handler.obj.RegisterResult;
-import handler.obj.RegisterRequest;
-import handler.obj.LoginResult;
-import handler.obj.LoginRequest;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -82,7 +77,7 @@ public class Service {
         return null;
     }
 
-    public String updateGame(String authToken, JoinGameRequest joinGameRequest) throws DataAccessException {
+    public String joinGame(String authToken, JoinGameRequest joinGameRequest) throws DataAccessException {
         AuthData authData = authDataAccess.getAuth(authToken);
         if (authData != null) {
             GameData gameData = gameDataAccess.getGame(joinGameRequest.getGameID());
@@ -92,7 +87,7 @@ public class Service {
                 }
                 GameData updatedGameData = new GameData(gameData.gameID(), authData.username(),
                         gameData.blackUsername(), gameData.gameName(), gameData.game());
-                gameDataAccess.updateGame(updatedGameData);
+                gameDataAccess.joinGame(updatedGameData);
                 return null;
             } else if (gameData != null && Objects.equals(joinGameRequest.getPlayerColor(), "BLACK")) {
                 if (gameData.blackUsername() != null) {
@@ -100,12 +95,30 @@ public class Service {
                 }
                 GameData updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(),
                         authData.username(), gameData.gameName(), gameData.game());
-                gameDataAccess.updateGame(updatedGameData);
+                gameDataAccess.joinGame(updatedGameData);
                 return null;
             }
             return "400";
         }
         return "401";
+    }
+
+    public String updateAGame(String authToken, int gameID, ChessGame chessGame) throws DataAccessException {
+        AuthData authData = authDataAccess.getAuth(authToken);
+        if (authData != null) {
+            gameDataAccess.updateGame(gameID, chessGame);
+            return null;
+        }
+        return "401";
+    }
+
+    public GameData getGame(String authToken, int gameID) throws DataAccessException {
+        AuthData authData = authDataAccess.getAuth(authToken);
+        if (authData != null) {
+            return gameDataAccess.getGame(gameID);
+        } else {
+            return null;
+        }
     }
 
     public void clear() throws DataAccessException {
