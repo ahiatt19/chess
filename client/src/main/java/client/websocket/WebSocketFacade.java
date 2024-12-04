@@ -4,6 +4,9 @@ import chess.ChessMove;
 import com.google.gson.Gson;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.NotficationMessage;
+import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -28,11 +31,32 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    System.out.println("On Message");
-                    System.out.println(message);
-
-                    // ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    handler.notify(message);
+                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+                    switch (serverMessage.getServerMessageType()) {
+                        case ERROR:
+                            ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                            try {
+                                handler.notify(errorMessage.getMessage());
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                            break;
+                        case NOTIFICATION:
+                            NotficationMessage notif = new Gson().fromJson(message, NotficationMessage.class);
+                            try {
+                                handler.notify(notif.getMessage());
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                            break;
+                        case LOAD_GAME:
+                            try {
+                                handler.notify("LOAD GAME");
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                            break;
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -47,9 +71,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void connect(String authToken, int gameID) throws Exception {
         try {
-            System.out.println("In connect in Web Socket Facade");
             UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
-            System.out.println(userGameCommand);
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException ex) {
             throw new Exception(ex.getMessage());

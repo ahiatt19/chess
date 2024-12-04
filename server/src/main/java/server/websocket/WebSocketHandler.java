@@ -3,7 +3,6 @@ package server.websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
-import handler.obj.JoinGameRequest;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -30,7 +29,6 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
-        System.out.println("In on Message of WSHandler");
         UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
         if (userGameCommand.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
             MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
@@ -40,7 +38,7 @@ public class WebSocketHandler {
         switch (userGameCommand.getCommandType()) {
             case CONNECT -> connect(session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
             case RESIGN -> resign(session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
-            case LEAVE -> leave(session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
+            case LEAVE -> leave(userGameCommand.getAuthToken(), userGameCommand.getGameID());
         }
     }
 
@@ -93,8 +91,7 @@ public class WebSocketHandler {
         }
     }
 
-    private void leave(Session session, String authToken, int gameID) throws Exception {
-        System.out.println("leave");
+    private void leave(String authToken, int gameID) throws Exception {
         String username = service.getUsername(authToken);
         GameData gameData = service.getGame(authToken, gameID);
 
@@ -105,7 +102,6 @@ public class WebSocketHandler {
             userColor = ChessGame.TeamColor.BLACK;
         }
         if (userColor != null) {
-            System.out.println("we be in this ho");
             service.leaveGame(gameID, userColor);
 
             var message = String.format("Player %s left the game", username);
@@ -122,17 +118,14 @@ public class WebSocketHandler {
     }
 
     private void makeMove(Session session, String authToken, int gameID, ChessMove move) throws Exception {
-        System.out.println("MAKING MOVES B");
         if (service.getGame(authToken, gameID) != null) {
             GameData game = service.getGame(authToken, gameID);
-            System.out.println(game.game().getGameOver());
             if (game.game().getGameOver()) {
                 errMessage(session, "The Game is Over.");
                 return;
             }
 
             boolean goodMove = false;
-            //System.out.println(game);
             Collection<ChessMove> validMoves = game.game().validMoves(move.getStartPosition());
             for (ChessMove m : validMoves) {
                 if (m.getEndPosition().getRow() == move.getEndPosition().getRow() &&
@@ -171,7 +164,6 @@ public class WebSocketHandler {
                 String startCoor = move.getStartPosition().getRow() + letterCoor(move.getStartPosition().getColumn());
                 String endCoor = move.getEndPosition().getRow() + letterCoor(move.getEndPosition().getColumn());
 
-                //notification to all others
 
                 var message = String.format("%s made the move %s to %s", username, startCoor, endCoor);
                 var notification = new NotficationMessage(message);

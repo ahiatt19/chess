@@ -5,6 +5,9 @@ import client.websocket.ServerMessageHandler;
 import websocket.messages.NotficationMessage;
 import websocket.messages.ServerMessage;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static java.awt.Color.RED;
@@ -23,6 +26,7 @@ public class Repl implements ServerMessageHandler {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
+        System.out.println();
         while (!result.equals("quit")) {
             printPrompt();
             String line = scanner.nextLine();
@@ -37,12 +41,22 @@ public class Repl implements ServerMessageHandler {
         }
     }
 
-    public void notify(String message) {
-        System.out.println(RED + "message.");
-        printPrompt();
+    public void notify(String message) throws Exception {
+        if (Objects.equals(message, "LOAD GAME")) {
+            System.out.println();
+            String str = client.redraw();
+            System.out.println(BLUE + str);
+            //Scanner scanner = new System(System.in);
+            // String line = scanner.nextLine();
+            printPrompt();
+        } else {
+            System.out.println();
+            System.out.println(PURPLE + message);
+            printPrompt();
+        }
     }
 
-    private void printPrompt() {
-        System.out.print("\n" + RESET + ">>> ");
+    public void printPrompt() {
+        System.out.print(RESET + ">>> ");
     }
 }

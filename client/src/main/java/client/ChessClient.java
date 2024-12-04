@@ -141,7 +141,7 @@ public class ChessClient {
 
             GameData gameData = server.getGame(authToken, gameID);
             ChessBoard chessBoard = gameData.game().getBoard();
-            main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
+            // main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
 
             var ws = new WebSocketFacade(serverUrl, handler);
             ws.connect(authToken, gameID);
@@ -162,6 +162,10 @@ public class ChessClient {
                     gameID = arr.get(i).gameID();
                 }
             }
+
+            var ws = new WebSocketFacade(serverUrl, handler);
+            ws.connect(authToken, gameID);
+
             inGameplay = true;
             gamePlayUI.setVars(gameID, params[0], "WHITE", UserType.OBSERVER);
             GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
@@ -173,18 +177,25 @@ public class ChessClient {
     }
 
     public String redraw() throws Exception {
-        assertSignedIn();
-        assertInGameplay();
+        try {
+            assertSignedIn();
+            assertInGameplay();
 
-        GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
-        ChessBoard chessBoard = gameData.game().getBoard();
-        main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
-        return "It's " + gameData.game().getTeamTurn() + "'s Turn to Move";
+            GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
+            ChessBoard chessBoard = gameData.game().getBoard();
+            main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
+            return "It's " + gameData.game().getTeamTurn() + "'s Turn to Move";
+        } catch (Exception e) {
+            throw new Exception("");
+        }
     }
 
     public String leave() throws Exception {
         assertSignedIn();
         assertInGameplay();
+
+        //ws.leave(authToken, gameID);
+
         inGameplay = false;
         String gameID = gamePlayUI.getUserGameID();
         gamePlayUI = new GamePlayUI();
@@ -264,6 +275,8 @@ public class ChessClient {
                         (piece.getTeamColor() == ChessGame.TeamColor.BLACK && Objects.equals(gamePlayUI.getPlayerColor(), "BLACK"))) {
                     chessGame.makeMove(new ChessMove(startPos, endPos, null));
                     server.updateGame(authToken, gamePlayUI.getGameID(), chessGame);
+
+                    ws.makeMove(authToken, gamePlayUI.getGameID(), new ChessMove(startPos, endPos, null));
 
                     main(gamePlayUI.getPlayerColor(), chessGame.getBoard(), null, null);
 
