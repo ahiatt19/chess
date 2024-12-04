@@ -167,9 +167,6 @@ public class ChessClient {
 
             var ws = new WebSocketFacade(serverUrl, handler);
             ws.connect(authToken, gameID);
-            // GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
-            // ChessBoard chessBoard = gameData.game().getBoard();
-            // main("WHITE", chessBoard, null, null);
             return "Observing Game ID: " + params[0];
         }
         return "Include game ID";

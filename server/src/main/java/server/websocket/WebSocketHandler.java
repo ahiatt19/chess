@@ -135,16 +135,16 @@ public class WebSocketHandler {
                 return;
             }
 
-            boolean goodMove = false;
+            boolean isGoodMove = false;
             Collection<ChessMove> validMoves = game.game().validMoves(move.getStartPosition());
-            for (ChessMove m : validMoves) {
-                if (m.getEndPosition().getRow() == move.getEndPosition().getRow() &&
-                        m.getEndPosition().getColumn() == move.getEndPosition().getColumn()) {
-                    goodMove = true;
+            for (ChessMove move1 : validMoves) {
+                if (move1.getEndPosition().getRow() == move.getEndPosition().getRow() &&
+                        move1.getEndPosition().getColumn() == move.getEndPosition().getColumn()) {
+                    isGoodMove = true;
                     break;
                 }
             }
-            if (goodMove) {
+            if (isGoodMove) {
                 ChessGame.TeamColor pieceColor = game.game().getBoard().getPiece(move.getStartPosition()).getTeamColor();
                 if (pieceColor != game.game().getTeamTurn()) {
                     errMessage(session, "It is " + game.game().getTeamTurn() + "'s turn");
