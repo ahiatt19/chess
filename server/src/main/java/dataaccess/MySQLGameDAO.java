@@ -3,7 +3,6 @@ package dataaccess;
 import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.*;
-import handler.obj.UpdateGameRequest;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -208,6 +207,10 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                     String currentTurn = jsonObject.get("currentTeamTurn").getAsString();
                     game.setTeamTurn(ChessGame.TeamColor.valueOf(currentTurn));
                 }
+                if (jsonObject.has("gameOver")) {
+                    boolean gameOver = jsonObject.get("gameOver").getAsBoolean();
+                    game.setGameOver(gameOver);
+                }
 
                 return game;
             }
@@ -251,6 +254,7 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
 
             // Serialize the current team turn
             jsonObject.addProperty("currentTeamTurn", chessGame.getTeamTurn().toString());
+            jsonObject.addProperty("gameOver", chessGame.getGameOver());
 
             // Serialize the chess board (game)
             JsonElement boardJson = context.serialize(chessGame.getBoard());
@@ -292,6 +296,7 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                 var serializer = gsonBuilder.create();
 
                 var chessGameString = serializer.toJson(chessGame);
+                System.out.println("SQL Update Game" + chessGameString);
                 ps.setString(1, chessGameString);
                 ps.setInt(2, gameID);
                 ps.executeUpdate();

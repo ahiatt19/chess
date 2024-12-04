@@ -3,11 +3,6 @@ package server.websocket;
 import chess.ChessGame;
 import com.google.gson.*;
 import org.eclipse.jetty.websocket.api.Session;
-import server.GetGameHandler;
-import server.JoinGameHandler;
-import websocket.messages.ErrorMessage;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.NotficationMessage;
 import websocket.messages.ServerMessage;
 
 import java.lang.reflect.Type;
@@ -86,6 +81,7 @@ public class ConnectionManager {
 
             // Serialize the current team turn
             jsonObject.addProperty("currentTeamTurn", chessGame.getTeamTurn().toString());
+            jsonObject.addProperty("gameOver", chessGame.getGameOver());
 
             // Serialize the chess board (game)
             JsonElement boardJson = context.serialize(chessGame.getBoard());

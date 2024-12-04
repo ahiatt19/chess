@@ -179,6 +179,10 @@ public class ServerFacade {
                     String currentTurn = jsonObject.get("currentTeamTurn").getAsString();
                     game.setTeamTurn(ChessGame.TeamColor.valueOf(currentTurn));
                 }
+                if (jsonObject.has("gameOver")) {
+                    boolean gameOver = jsonObject.get("gameOver").getAsBoolean();
+                    game.setGameOver(gameOver);
+                }
 
                 return game;
             }

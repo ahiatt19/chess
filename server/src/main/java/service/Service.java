@@ -81,7 +81,7 @@ public class Service {
         AuthData authData = authDataAccess.getAuth(authToken);
         if (authData != null) {
             GameData gameData = gameDataAccess.getGame(joinGameRequest.getGameID());
-            if (gameData != null && Objects.equals(joinGameRequest.getPlayerColor(), "WHITE")) {
+            if (Objects.equals(joinGameRequest.getPlayerColor(), "WHITE")) {
                 if (gameData.whiteUsername() != null) {
                     return "403";
                 }

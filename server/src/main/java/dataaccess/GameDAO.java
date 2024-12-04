@@ -1,7 +1,6 @@
 package dataaccess;
 
 import chess.ChessGame;
-import handler.obj.UpdateGameRequest;
 import model.GameData;
 import handler.obj.ListGamesData;
 

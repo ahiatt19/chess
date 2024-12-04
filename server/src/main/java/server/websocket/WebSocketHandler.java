@@ -13,7 +13,6 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotficationMessage;
-import websocket.messages.ServerMessage;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -68,17 +67,36 @@ public class WebSocketHandler {
         System.out.println("resign");
 
         String username = service.getUsername(authToken);
-        var message = String.format("%s resigned from the game", username);
-        var notification = new NotficationMessage(message);
-        connections.broadcastNotification("", notification);
+        GameData gameData = service.getGame(authToken, gameID);
+        ChessGame.TeamColor userColor = null;
+        if (Objects.equals(gameData.whiteUsername(), username)) {
+            userColor = ChessGame.TeamColor.WHITE;
+        } else if (Objects.equals(gameData.blackUsername(), username)) {
+            userColor = ChessGame.TeamColor.BLACK;
+        }
+        if (userColor != null) {
+            gameData.game().setGameOver(true);
+            service.updateAGame(authToken, gameID, gameData.game());
 
-        connections.remove(authToken);
+
+            var message = String.format("%s resigned from the game", username);
+            var notification = new NotficationMessage(message);
+            connections.broadcastNotification("", notification);
+
+            connections.remove(authToken);
+        }
+        errMessage(session, "You Cannot Resign as an Observer");
     }
 
     private void makeMove(Session session, String authToken, int gameID, ChessMove move) throws Exception {
         System.out.println("MAKING MOVES B");
         if (service.getGame(authToken, gameID) != null) {
             GameData game = service.getGame(authToken, gameID);
+            System.out.println(game.game().getGameOver());
+            if (game.game().getGameOver()) {
+                errMessage(session, "The Game is Over, No More Moves Can be Made.");
+                return;
+            }
 
             boolean goodMove = false;
             //System.out.println(game);
@@ -93,10 +111,7 @@ public class WebSocketHandler {
             if (goodMove) {
                 ChessGame.TeamColor pieceColor = game.game().getBoard().getPiece(move.getStartPosition()).getTeamColor();
                 if (pieceColor != game.game().getTeamTurn()) {
-                    var error = new ErrorMessage("It is " + game.game().getTeamTurn() + "'s turn");
-                    Gson gson = new Gson();
-                    var json = gson.toJson(error);
-                    session.getRemote().sendString(json);
+                    errMessage(session, "It is " + game.game().getTeamTurn() + "'s turn");
                     return;
                 }
                 String username = service.getUsername(authToken);
@@ -109,10 +124,7 @@ public class WebSocketHandler {
                 }
 
                 if (pieceColor != userColor) {
-                    var error = new ErrorMessage("You May Only Move " + userColor + " Pieces.");
-                    Gson gson = new Gson();
-                    var json = gson.toJson(error);
-                    session.getRemote().sendString(json);
+                    errMessage(session, "You May Only Move " + userColor + " Pieces.");
                     return;
                 }
 
@@ -132,17 +144,18 @@ public class WebSocketHandler {
                 var notification = new NotficationMessage(message);
                 connections.broadcastNotification(authToken, notification);
             } else {
-                var error = new ErrorMessage("The Move was not Valid");
-                Gson gson = new Gson();
-                var json = gson.toJson(error);
-                session.getRemote().sendString(json);
+                errMessage(session, "The Move was not Valid");
             }
         } else {
-            var error = new ErrorMessage("Not Authorized to Make a Move");
-            Gson gson = new Gson();
-            var json = gson.toJson(error);
-            session.getRemote().sendString(json);
+            errMessage(session, "Not Authorized to Make a Move");
         }
+    }
+
+    public void errMessage(Session session, String message) throws Exception {
+        var error = new ErrorMessage(message);
+        Gson gson = new Gson();
+        var json = gson.toJson(error);
+        session.getRemote().sendString(json);
     }
 
     public String letterCoor(int itr) {

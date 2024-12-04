@@ -2,7 +2,6 @@ package dataaccess;
 
 import chess.ChessGame;
 
-import handler.obj.UpdateGameRequest;
 import model.AuthData;
 import model.GameData;
 import model.UserData;

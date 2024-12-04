@@ -13,10 +13,12 @@ import java.util.Objects;
 public class ChessGame {
     private static ChessBoard game;
     private static TeamColor currentTeamTurn;
+    private static boolean gameOver;
 
     public ChessGame() {
         game = new ChessBoard();
         game.resetBoard();
+        gameOver = false;
         currentTeamTurn = TeamColor.WHITE;
     }
 
@@ -73,6 +75,14 @@ public class ChessGame {
     public enum TeamColor {
         WHITE,
         BLACK
+    }
+
+    public boolean getGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean over) {
+        gameOver = over;
     }
 
     /**

@@ -3,7 +3,6 @@ package server;
 import chess.ChessGame;
 import com.google.gson.*;
 import dataaccess.DataAccessException;
-import dataaccess.MySQLGameDAO;
 import model.GameData;
 import service.Service;
 import spark.Request;
