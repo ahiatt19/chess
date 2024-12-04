@@ -81,22 +81,24 @@ public class Service {
         AuthData authData = authDataAccess.getAuth(authToken);
         if (authData != null) {
             GameData gameData = gameDataAccess.getGame(joinGameRequest.getGameID());
-            if (Objects.equals(joinGameRequest.getPlayerColor(), "WHITE")) {
-                if (gameData.whiteUsername() != null) {
-                    return "403";
+            if (gameData != null) {
+                if (Objects.equals(joinGameRequest.getPlayerColor(), "WHITE")) {
+                    if (gameData.whiteUsername() != null) {
+                        return "403";
+                    }
+                    GameData updatedGameData = new GameData(gameData.gameID(), authData.username(),
+                            gameData.blackUsername(), gameData.gameName(), gameData.game());
+                    gameDataAccess.joinGame(updatedGameData);
+                    return null;
+                } else if (gameData != null && Objects.equals(joinGameRequest.getPlayerColor(), "BLACK")) {
+                    if (gameData.blackUsername() != null) {
+                        return "403";
+                    }
+                    GameData updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(),
+                            authData.username(), gameData.gameName(), gameData.game());
+                    gameDataAccess.joinGame(updatedGameData);
+                    return null;
                 }
-                GameData updatedGameData = new GameData(gameData.gameID(), authData.username(),
-                        gameData.blackUsername(), gameData.gameName(), gameData.game());
-                gameDataAccess.joinGame(updatedGameData);
-                return null;
-            } else if (gameData != null && Objects.equals(joinGameRequest.getPlayerColor(), "BLACK")) {
-                if (gameData.blackUsername() != null) {
-                    return "403";
-                }
-                GameData updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(),
-                        authData.username(), gameData.gameName(), gameData.game());
-                gameDataAccess.joinGame(updatedGameData);
-                return null;
             }
             return "400";
         }
