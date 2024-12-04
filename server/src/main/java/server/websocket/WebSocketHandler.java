@@ -68,6 +68,10 @@ public class WebSocketHandler {
 
         String username = service.getUsername(authToken);
         GameData gameData = service.getGame(authToken, gameID);
+        if (gameData.game().getGameOver()) {
+            errMessage(session, "The Game is Over.");
+            return;
+        }
         ChessGame.TeamColor userColor = null;
         if (Objects.equals(gameData.whiteUsername(), username)) {
             userColor = ChessGame.TeamColor.WHITE;
@@ -84,8 +88,9 @@ public class WebSocketHandler {
             connections.broadcastNotification("", notification);
 
             connections.remove(authToken);
+        } else {
+            errMessage(session, "You Cannot Resign as an Observer");
         }
-        errMessage(session, "You Cannot Resign as an Observer");
     }
 
     private void makeMove(Session session, String authToken, int gameID, ChessMove move) throws Exception {
@@ -94,7 +99,7 @@ public class WebSocketHandler {
             GameData game = service.getGame(authToken, gameID);
             System.out.println(game.game().getGameOver());
             if (game.game().getGameOver()) {
-                errMessage(session, "The Game is Over, No More Moves Can be Made.");
+                errMessage(session, "The Game is Over.");
                 return;
             }
 

@@ -296,7 +296,6 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
                 var serializer = gsonBuilder.create();
 
                 var chessGameString = serializer.toJson(chessGame);
-                System.out.println("SQL Update Game" + chessGameString);
                 ps.setString(1, chessGameString);
                 ps.setInt(2, gameID);
                 ps.executeUpdate();
