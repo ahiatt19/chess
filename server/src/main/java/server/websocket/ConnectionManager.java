@@ -22,11 +22,11 @@ public class ConnectionManager {
         connections.remove(authToken);
     }
 
-    public void broadcastNotification(String excludeauthToken, ServerMessage message) throws Exception {
+    public void broadcast(String excludeauthToken, ServerMessage message, int gameID) throws Exception {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
-                if (!c.authToken.equals(excludeauthToken)) {
+                if (!c.authToken.equals(excludeauthToken) && c.gameID == gameID) {
                     if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
                         var gsonBuilder = new GsonBuilder();
                         gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());

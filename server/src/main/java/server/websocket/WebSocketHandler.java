@@ -56,7 +56,7 @@ public class WebSocketHandler {
 
             var message = String.format("%s joined the game", username);
             var notification = new NotficationMessage(message);
-            connections.broadcastNotification(authToken, notification);
+            connections.broadcast(authToken, notification, gameID);
         } else {
             var error = new ErrorMessage("That Game Does Not Exist.");
             Gson gson = new Gson();
@@ -85,7 +85,7 @@ public class WebSocketHandler {
 
             var message = String.format("%s resigned from the game", username);
             var notification = new NotficationMessage(message);
-            connections.broadcastNotification("", notification);
+            connections.broadcast("", notification, gameID);
 
             connections.remove(authToken);
         } else {
@@ -110,13 +110,13 @@ public class WebSocketHandler {
 
             var message = String.format("Player %s left the game", username);
             var notification = new NotficationMessage(message);
-            connections.broadcastNotification(authToken, notification);
+            connections.broadcast(authToken, notification, gameID);
             connections.remove(authToken);
         } else {
 
             var message = String.format("Observer %s left the game", username);
             var notification = new NotficationMessage(message);
-            connections.broadcastNotification(authToken, notification);
+            connections.broadcast(authToken, notification, gameID);
             connections.remove(authToken);
         }
     }
@@ -166,7 +166,7 @@ public class WebSocketHandler {
 
                 //load game to all in session
                 var loadGame = new LoadGameMessage(game);
-                connections.broadcastNotification("", loadGame);
+                connections.broadcast("", loadGame, gameID);
 
                 String startCoor = move.getStartPosition().getRow() + letterCoor(move.getStartPosition().getColumn());
                 String endCoor = move.getEndPosition().getRow() + letterCoor(move.getEndPosition().getColumn());
@@ -175,7 +175,7 @@ public class WebSocketHandler {
 
                 var message = String.format("%s made the move %s to %s", username, startCoor, endCoor);
                 var notification = new NotficationMessage(message);
-                connections.broadcastNotification(authToken, notification);
+                connections.broadcast(authToken, notification, gameID);
             } else {
                 errMessage(session, "The Move was not Valid");
             }
