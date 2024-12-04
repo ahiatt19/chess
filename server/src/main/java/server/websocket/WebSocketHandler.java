@@ -15,6 +15,8 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotficationMessage;
 import websocket.messages.ServerMessage;
 
+import java.util.Collection;
+
 @WebSocket
 public class WebSocketHandler {
 
@@ -64,21 +66,40 @@ public class WebSocketHandler {
         System.out.println("MAKING MOVES B");
         if (service.getGame(authToken, gameID) != null) {
             GameData game = service.getGame(authToken, gameID);
-            game.game().makeMove(move);
-            service.updateAGame(authToken, gameID, game.game());
 
-            //load game to all in session
-            var loadGame = new LoadGameMessage(game);
-            connections.broadcastNotification("", loadGame);
+            boolean goodMove = false;
+            //System.out.println(game);
+            Collection<ChessMove> validMoves = game.game().validMoves(move.getStartPosition());
+            for (ChessMove m : validMoves) {
+                if (m.getEndPosition().getRow() == move.getEndPosition().getRow() &&
+                        m.getEndPosition().getColumn() == move.getEndPosition().getColumn()) {
+                    goodMove = true;
+                    break;
+                }
+            }
+            if (goodMove) {
 
-            String startCoor = move.getStartPosition().getRow() + letterCoor(move.getStartPosition().getColumn());
-            String endCoor = move.getEndPosition().getRow() + letterCoor(move.getEndPosition().getColumn());
+                game.game().makeMove(move);
+                service.updateAGame(authToken, gameID, game.game());
 
-            //notification to all others
-            String username = service.getUsername(authToken);
-            var message = String.format("%s made the move %s to %s", username, startCoor, endCoor);
-            var notification = new NotficationMessage(message);
-            connections.broadcastNotification(authToken, notification);
+                //load game to all in session
+                var loadGame = new LoadGameMessage(game);
+                connections.broadcastNotification("", loadGame);
+
+                String startCoor = move.getStartPosition().getRow() + letterCoor(move.getStartPosition().getColumn());
+                String endCoor = move.getEndPosition().getRow() + letterCoor(move.getEndPosition().getColumn());
+
+                //notification to all others
+                String username = service.getUsername(authToken);
+                var message = String.format("%s made the move %s to %s", username, startCoor, endCoor);
+                var notification = new NotficationMessage(message);
+                connections.broadcastNotification(authToken, notification);
+            } else {
+                var error = new ErrorMessage("The Move was not Valid");
+                Gson gson = new Gson();
+                var json = gson.toJson(error);
+                session.getRemote().sendString(json);
+            }
         } else {
             var error = new ErrorMessage("There was an Error Making a Move");
             Gson gson = new Gson();
