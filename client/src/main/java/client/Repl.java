@@ -2,6 +2,7 @@ package client;
 
 
 import client.websocket.ServerMessageHandler;
+import websocket.messages.NotficationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
@@ -36,10 +37,15 @@ public class Repl implements ServerMessageHandler {
         }
     }
 
-    public void notify(ServerMessage message) {
-        System.out.println(RED + " IN HERE nofity repl");
+    public void notify(String message) {
+        System.out.println(RED + "message.");
         printPrompt();
     }
+/*
+    public void notifyNotif(NotficationMessage message) {
+        System.out.println(RED + message.);
+        printPrompt();
+    }*/
 
     private void printPrompt() {
         System.out.print("\n" + RESET + ">>> ");

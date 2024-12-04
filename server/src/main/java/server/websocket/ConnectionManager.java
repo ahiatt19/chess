@@ -4,6 +4,8 @@ import chess.ChessGame;
 import com.google.gson.*;
 import org.eclipse.jetty.websocket.api.Session;
 import server.GetGameHandler;
+import server.JoinGameHandler;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotficationMessage;
 import websocket.messages.ServerMessage;
@@ -18,16 +20,16 @@ public class ConnectionManager {
     public void add(int gameID, String authToken, Session session) {
         var connection = new Connection(gameID, authToken, session);
         connections.put(authToken, connection);
-        System.out.println("Connections: " + connections);
+        // System.out.println("Connections: " + connections);
     }
 
     public void remove(String authToken) {
         connections.remove(authToken);
     }
 
-    public void broadcast(String excludeauthToken, NotficationMessage notification) throws Exception {
+    public void broadcastNotification(String excludeauthToken, NotficationMessage notification) throws Exception {
         var removeList = new ArrayList<Connection>();
-        System.out.println("in broadcast");
+        //System.out.println("in broadcast");
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.authToken.equals(excludeauthToken)) {
@@ -46,19 +48,21 @@ public class ConnectionManager {
         }
     }
 
-    public void send(String authToken, LoadGameMessage loadGameMessage) throws Exception {
+    public void send(String authToken, ServerMessage serverMessage) throws Exception {
         var removeList = new ArrayList<Connection>();
-        System.out.println("in send");
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (c.authToken.equals(authToken)) {
-                    var gsonBuilder = new GsonBuilder();
-                    gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());
-                    var serializer = gsonBuilder.create();
+                    if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        var gsonBuilder = new GsonBuilder();
+                        gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());
+                        var serializer = gsonBuilder.create();
 
-                    var loadGameJSON = serializer.toJson(loadGameMessage);
-                    System.out.println(loadGameJSON);
-                    c.send(loadGameJSON);
+                        var loadGameJSON = serializer.toJson(serverMessage);
+                        System.out.println(loadGameJSON);
+                        c.send(loadGameJSON);
+                    }
+
                 }
             } else {
                 removeList.add(c);

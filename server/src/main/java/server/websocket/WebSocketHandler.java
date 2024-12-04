@@ -7,8 +7,10 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.Service;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotficationMessage;
+import websocket.messages.ServerMessage;
 
 @WebSocket
 public class WebSocketHandler {
@@ -31,16 +33,23 @@ public class WebSocketHandler {
     }
 
     private void connect(Session session, String authToken, int gameID) throws Exception{
-        connections.add(gameID, authToken, session);
-        String username = service.getUsername(authToken);
+        if (service.getGame(authToken, gameID) != null) {
+            connections.add(gameID, authToken, session);
+            String username = service.getUsername(authToken);
 
-        GameData gameData = service.getGame(authToken, gameID);
+            GameData gameData = service.getGame(authToken, gameID);
 
-        var loadGame = new LoadGameMessage(gameData);
-        connections.send(authToken, loadGame);
+            var loadGame = new LoadGameMessage(gameData);
+            connections.send(authToken, loadGame);
 
-        var message = String.format("%s joined the game", username);
-        var notification = new NotficationMessage(message);
-        connections.broadcast(authToken, notification);
+            var message = String.format("%s joined the game", username);
+            var notification = new NotficationMessage(message);
+            connections.broadcastNotification(authToken, notification);
+        } else {
+            var error = new ErrorMessage("That Game Does Not Exist.");
+            Gson gson = new Gson();
+            var json = gson.toJson(error);
+            session.getRemote().sendString(json);
+        }
     }
 }

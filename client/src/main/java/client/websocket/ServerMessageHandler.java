@@ -4,5 +4,7 @@ import websocket.messages.NotficationMessage;
 import websocket.messages.ServerMessage;
 
 public interface ServerMessageHandler {
-    void notify(ServerMessage message);
+    void notify(String message);
+
+    // void notfiyNotif(NotficationMessage message);
 }

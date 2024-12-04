@@ -32,8 +32,8 @@ public class WebSocketFacade extends Endpoint {
                     System.out.println("On Message");
                     System.out.println(message);
 
-                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    handler.notify(serverMessage);
+                    // ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+                    handler.notify(message);
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
