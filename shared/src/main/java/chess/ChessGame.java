@@ -147,7 +147,7 @@ public class ChessGame {
                 game.removePiece(move.getStartPosition());
                 currentTeamTurn = getNextTeamColor(currentTeamTurn);
             }
-            else {throw new chess.InvalidMoveException("INVALID");}
+            else {throw new chess.InvalidMoveException("That Move is Not Valid");}
         } catch (NullPointerException n) {
             throw new chess.InvalidMoveException("Invalid Move");
         }

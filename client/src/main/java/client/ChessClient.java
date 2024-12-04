@@ -1,21 +1,16 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import client.websocket.ServerMessageHandler;
 import client.websocket.WebSocketFacade;
 import handler.obj.*;
+import model.GameData;
 import model.UserData;
 import server.ServerFacade;
 import ui.GamePlayUI;
 import ui.UserType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
 import static ui.ChessBoardUI.main;
 
@@ -27,6 +22,7 @@ public class ChessClient {
     private boolean inGameplay = false;
     private String authToken;
     private GamePlayUI gamePlayUI = new GamePlayUI();
+    private boolean resigning = false;
 
     public ChessClient(String serverUrl, ServerMessageHandler handler) {
         server = new ServerFacade(serverUrl);
@@ -39,6 +35,12 @@ public class ChessClient {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            if (resigning) {
+                return switch (cmd.toUpperCase()) {
+                    case "YES" -> actuallyResign();
+                    default -> dontResign();
+                };
+            }
             return switch (cmd) {
                 case "quit" -> "quit";
                 case "login" -> login(params);
@@ -54,6 +56,7 @@ public class ChessClient {
                 case "highlight" -> highlight(params);
                 case "move" -> move(params);
                 default -> help();
+
             };
         } catch (Exception ex) {
             return ex.getMessage();
@@ -135,8 +138,8 @@ public class ChessClient {
             gamePlayUI.setVars(gameID, params[1], params[0].toUpperCase(), UserType.PLAYER);
             inGameplay = true;
 
-            ChessBoard chessBoard = new ChessBoard();
-            chessBoard.resetBoard();
+            GameData gameData = server.getGame(authToken, gameID);
+            ChessBoard chessBoard = gameData.game().getBoard();
             main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
             var ws = new WebSocketFacade(serverUrl, handler);
             ws.joinGame(authToken, params[0].toUpperCase());
@@ -158,8 +161,8 @@ public class ChessClient {
             }
             inGameplay = true;
             gamePlayUI.setVars(gameID, params[0], "WHITE", UserType.OBSERVER);
-            ChessBoard chessBoard = new ChessBoard();
-            chessBoard.resetBoard();
+            GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
+            ChessBoard chessBoard = gameData.game().getBoard();
             main("WHITE", chessBoard, null, null);
             return "Observing Game ID: " + params[0];
         }
@@ -169,11 +172,11 @@ public class ChessClient {
     public String redraw() throws Exception {
         assertSignedIn();
         assertInGameplay();
-        // server.getChessBoard()
-        ChessBoard chessBoard = new ChessBoard();
-        chessBoard.resetBoard();
+
+        GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
+        ChessBoard chessBoard = gameData.game().getBoard();
         main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
-        return "Here is the current game state.";
+        return "It's " + gameData.game().getTeamTurn() + "'s Turn to Move";
     }
 
     public String leave() throws Exception {
@@ -190,17 +193,26 @@ public class ChessClient {
         assertInGameplay();
         assertPlayer();
 
+        resigning = true;
+        return "Are you sure you want to resign? YES/NO";
+    }
 
+    public String actuallyResign() {
         // change the player to an observer so they can only look at the game now
         String gameID = gamePlayUI.getUserGameID();
         gamePlayUI.setVars(gamePlayUI.getGameID(), gamePlayUI.getUserGameID(), gamePlayUI.getPlayerColor(), UserType.OBSERVER);
-        return "You have resigned from game " + gameID;
+        resigning = false;
+        return "You Have Resigned From Game ID: " + gameID;
+    }
+
+    public String dontResign() {
+        resigning = false;
+        return "You Did Not Resign";
     }
 
     public String highlight(String... params) throws Exception {
         assertSignedIn();
         assertInGameplay();
-        assertPlayer();
         if (params.length >= 1) {
             String num = params[0].substring(0, 1);
             String let = params[0].substring(1, 2);
@@ -210,7 +222,8 @@ public class ChessClient {
                 int row = Integer.parseInt(num);
                 int col = letterCoor(let.toUpperCase());
                 ChessPosition pos = new ChessPosition(row, col);
-                ChessGame chessGame = new ChessGame();
+                GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
+                ChessGame chessGame = gameData.game();
                 if (chessGame.getChessPiece(pos)) {
                     Collection<ChessMove> moves = chessGame.validMoves(pos);
                     main(gamePlayUI.getPlayerColor(), chessGame.getBoard(), moves, pos);
@@ -238,12 +251,23 @@ public class ChessClient {
             if (startNum.matches(numRegex) && endNum.matches(numRegex) && startLet.matches(letRegex) && endLet.matches(letRegex)) {
                 ChessPosition startPos = new ChessPosition(Integer.parseInt(startNum), letterCoor(startLet.toUpperCase()));
                 ChessPosition endPos = new ChessPosition(Integer.parseInt(endNum), letterCoor(endLet.toUpperCase()));
-                ChessGame chessGame = new ChessGame();
-                chessGame.makeMove(new ChessMove(startPos, endPos, null));
+                GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
+                ChessGame chessGame = gameData.game();
 
-                main(gamePlayUI.getPlayerColor(), chessGame.getBoard(), null, null);
+                ChessBoard board = chessGame.getBoard();
+                ChessPiece piece = board.getPiece(startPos);
 
-                return "Made the move " + params[0] + " -> " + params[1];
+                if ((piece.getTeamColor() == ChessGame.TeamColor.WHITE && Objects.equals(gamePlayUI.getPlayerColor(), "WHITE")) ||
+                        (piece.getTeamColor() == ChessGame.TeamColor.BLACK && Objects.equals(gamePlayUI.getPlayerColor(), "BLACK"))) {
+                    chessGame.makeMove(new ChessMove(startPos, endPos, null));
+                    server.updateGame(authToken, gamePlayUI.getGameID(), chessGame);
+
+                    main(gamePlayUI.getPlayerColor(), chessGame.getBoard(), null, null);
+
+                    return gamePlayUI.getPlayerColor() + " made the move " + params[0] + " -> " + params[1];
+                } else {
+                    return "You May Only Move " + gamePlayUI.getPlayerColor() + " Pieces";
+                }
             }
         }
         return "The Coordinates are Not Valid";
@@ -268,6 +292,8 @@ public class ChessClient {
             if (inGameplay) {
                 if (gamePlayUI.getUserType() == UserType.OBSERVER) {
                     return """
+                            highlight <1-8><a-b> -- Highlight Possible Moves for a Piece\
+                            
                             redraw -- Redraws Chess Board\
                             
                             leave -- Leave the Game\
@@ -276,9 +302,9 @@ public class ChessClient {
                 }
                 if (gamePlayUI.getUserType() == UserType.PLAYER) {
                     return """
-                            move <1-8> <a-b> -- Make a Move\
+                            move <1-8><a-b> <1-8><a-b> -- Make a Move from Piece to New Coordinate\
                             
-                            highlight <1-8> <a-b> -- Highlight Possible Moves for a Piece\
+                            highlight <1-8><a-b> -- Highlight Possible Moves for a Piece\
                             
                             redraw -- Redraws Chess Board\
                             
