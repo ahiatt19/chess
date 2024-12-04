@@ -115,13 +115,12 @@ public class WebSocketHandler {
         if (userColor != null) {
             service.leaveGame(gameID, userColor);
 
-            var message = String.format("Player %s left the game", username);
+            var message = String.format("Player %s Left the Game", username);
             var notification = new NotficationMessage(message);
             connections.broadcast(authToken, notification, gameID);
             connections.remove(authToken);
         } else {
-
-            var message = String.format("Observer %s left the game", username);
+            var message = String.format("Observer %s Left the Game", username);
             var notification = new NotficationMessage(message);
             connections.broadcast(authToken, notification, gameID);
             connections.remove(authToken);
@@ -166,19 +165,34 @@ public class WebSocketHandler {
                 }
 
                 game.game().makeMove(move);
-                service.updateAGame(authToken, gameID, game.game());
-
-                //load game to all in session
-                var loadGame = new LoadGameMessage(game);
-                connections.broadcast("", loadGame, gameID);
 
                 String startCoor = move.getStartPosition().getRow() + letterCoor(move.getStartPosition().getColumn());
                 String endCoor = move.getEndPosition().getRow() + letterCoor(move.getEndPosition().getColumn());
-
-
                 var message = String.format("%s made the move %s to %s", username, startCoor, endCoor);
                 var notification = new NotficationMessage(message);
                 connections.broadcast(authToken, notification, gameID);
+
+                var gameMessage = "";
+                if (game.game().isInCheckmate(game.game().getTeamTurn())) {
+                    gameMessage = String.format("%s is in CheckMate, %s Has Won", game.game().getTeamTurn(), username);
+                    game.game().setGameOver(true);
+                    var notification1 = new NotficationMessage(gameMessage);
+                    connections.broadcast("", notification1, gameID);
+                } else if (game.game().isInStalemate(game.game().getTeamTurn())) {
+                    gameMessage = String.format("The Game is in Stalemate, Game Over");
+                    game.game().setGameOver(true);
+                    var notification2 = new NotficationMessage(gameMessage);
+                    connections.broadcast("", notification2, gameID);
+                } else if (game.game().isInCheck(game.game().getTeamTurn())) {
+                    gameMessage = String.format("%s is in Check", game.game().getTeamTurn());
+                    var notification3 = new NotficationMessage(gameMessage);
+                    connections.broadcast("", notification3, gameID);
+                }
+
+                service.updateAGame(authToken, gameID, game.game());
+                //load game to all in session
+                var loadGame = new LoadGameMessage(game);
+                connections.broadcast("", loadGame, gameID);
             } else {
                 errMessage(session, "The Move was not Valid");
             }

@@ -181,8 +181,12 @@ public class ChessClient {
             assertInGameplay();
 
             GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
+
             ChessBoard chessBoard = gameData.game().getBoard();
             main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
+            if (gameData.game().getGameOver()) {
+                return "Game is Over. Thanks for Playing!";
+            }
             return "It's " + gameData.game().getTeamTurn() + "'s Turn to Move";
         } catch (Exception e) {
             throw new Exception("");
@@ -193,7 +197,8 @@ public class ChessClient {
         assertSignedIn();
         assertInGameplay();
 
-        //ws.leave(authToken, gameID);
+        var ws = new WebSocketFacade(serverUrl, handler);
+        ws.leave(authToken, gamePlayUI.getGameID());
 
         inGameplay = false;
         String gameID = gamePlayUI.getUserGameID();
@@ -210,11 +215,15 @@ public class ChessClient {
         return "Are you sure you want to resign? YES/NO";
     }
 
-    public String actuallyResign() {
+    public String actuallyResign() throws Exception {
         // change the player to an observer so they can only look at the game now
+        var ws = new WebSocketFacade(serverUrl, handler);
+        ws.resign(authToken, gamePlayUI.getGameID());
+
         String gameID = gamePlayUI.getUserGameID();
         gamePlayUI.setVars(gamePlayUI.getGameID(), gamePlayUI.getUserGameID(), gamePlayUI.getPlayerColor(), UserType.OBSERVER);
         resigning = false;
+
         return "You Have Resigned From Game ID: " + gameID;
     }
 
@@ -264,28 +273,20 @@ public class ChessClient {
             if (startNum.matches(numRegex) && endNum.matches(numRegex) && startLet.matches(letRegex) && endLet.matches(letRegex)) {
                 ChessPosition startPos = new ChessPosition(Integer.parseInt(startNum), letterCoor(startLet.toUpperCase()));
                 ChessPosition endPos = new ChessPosition(Integer.parseInt(endNum), letterCoor(endLet.toUpperCase()));
+
+                ChessMove move = new ChessMove(startPos, endPos, null);
                 GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
-                ChessGame chessGame = gameData.game();
 
-                ChessBoard board = chessGame.getBoard();
-                ChessPiece piece = board.getPiece(startPos);
-
-                if ((piece.getTeamColor() == ChessGame.TeamColor.WHITE && Objects.equals(gamePlayUI.getPlayerColor(), "WHITE")) ||
-                        (piece.getTeamColor() == ChessGame.TeamColor.BLACK && Objects.equals(gamePlayUI.getPlayerColor(), "BLACK"))) {
-                    chessGame.makeMove(new ChessMove(startPos, endPos, null));
-                    server.updateGame(authToken, gamePlayUI.getGameID(), chessGame);
-
-                    ws.makeMove(authToken, gamePlayUI.getGameID(), new ChessMove(startPos, endPos, null));
-
-                    main(gamePlayUI.getPlayerColor(), chessGame.getBoard(), null, null);
-
-                    return gamePlayUI.getPlayerColor() + " made the move " + params[0] + " -> " + params[1];
+                if (gameData.game().getGameOver()) {
+                    return "Game is Over";
                 } else {
-                    return "You May Only Move " + gamePlayUI.getPlayerColor() + " Pieces";
+                    var ws = new WebSocketFacade(serverUrl, handler);
+                    ws.makeMove(authToken, gamePlayUI.getGameID(), move);
                 }
             }
+            return "Made Move " + params[0] + " to " + params[1];
         }
-        return "The Coordinates are Not Valid";
+        return "To Make a Move: move <1-8><a-h> <1-8><a-h>";
     }
 
     public int letterCoor(String letter) {
@@ -371,7 +372,7 @@ public class ChessClient {
 
     private void assertPlayer() throws Exception {
         if (gamePlayUI.getUserType() != UserType.PLAYER) {
-            throw new Exception("You must be a player to resign");
+            throw new Exception("You are not a Player");
         }
     }
 }

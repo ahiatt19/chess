@@ -80,10 +80,26 @@ public class WebSocketFacade extends Endpoint {
 
     public void makeMove(String authToken, int gameID, ChessMove move) throws Exception {
         try {
-            System.out.println("In makeMove in Web Socket Facade");
             MakeMoveCommand makeMoveCommand = new MakeMoveCommand(authToken, gameID, move);
-            System.out.println(makeMoveCommand);
             this.session.getBasicRemote().sendText(new Gson().toJson(makeMoveCommand));
+        } catch (IOException ex) {
+            throw new Exception(ex.getMessage());
+        }
+    }
+
+    public void leave(String authToken, int gameID) throws Exception {
+        try {
+            UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (IOException ex) {
+            throw new Exception(ex.getMessage());
+        }
+    }
+
+    public void resign(String authToken, int gameID) throws Exception {
+        try {
+            UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException ex) {
             throw new Exception(ex.getMessage());
         }
