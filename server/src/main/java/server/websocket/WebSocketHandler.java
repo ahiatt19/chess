@@ -78,7 +78,12 @@ public class WebSocketHandler {
                 }
             }
             if (goodMove) {
-
+                if (game.game().getBoard().getPiece(move.getStartPosition()).getTeamColor() != game.game().getTeamTurn()) {
+                    var error = new ErrorMessage("It is " + game.game().getTeamTurn() + "'s turn");
+                    Gson gson = new Gson();
+                    var json = gson.toJson(error);
+                    session.getRemote().sendString(json);
+                }
                 game.game().makeMove(move);
                 service.updateAGame(authToken, gameID, game.game());
 
@@ -101,7 +106,7 @@ public class WebSocketHandler {
                 session.getRemote().sendString(json);
             }
         } else {
-            var error = new ErrorMessage("There was an Error Making a Move");
+            var error = new ErrorMessage("Not Authorized to Make a Move");
             Gson gson = new Gson();
             var json = gson.toJson(error);
             session.getRemote().sendString(json);
