@@ -2,8 +2,10 @@ package client.websocket;
 
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
+import javax.management.Notification;
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
@@ -11,7 +13,6 @@ import java.net.URISyntaxException;
 
 //need to extend Endpoint for websocket to work properly
 public class WebSocketFacade extends Endpoint {
-
     Session session;
     ServerMessageHandler handler;
     
@@ -28,6 +29,9 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
+                    System.out.println("On Message");
+                    System.out.println(message);
+
                     ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
                     handler.notify(serverMessage);
                 }
@@ -42,10 +46,12 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinGame(String authToken, String playerColor) throws Exception {
+    public void connect(String authToken, int gameID) throws Exception {
         try {
-            var action = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, authToken);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+            System.out.println("In connect in Web Socket Facade");
+            UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            System.out.println(userGameCommand);
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException ex) {
             throw new Exception(ex.getMessage());
         }

@@ -1,12 +1,14 @@
 package server.websocket;
 
 import com.google.gson.Gson;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.Service;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotficationMessage;
 
 @WebSocket
 public class WebSocketHandler {
@@ -20,22 +22,25 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
-        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+        System.out.println("In on Message of WSHandler");
+        UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
 
-        String username = service.getUsername(command.getAuthToken());
-
-        connections.add(command.getGameID(), command.getAuthToken(), session);
-
-        switch (command.getCommandType()) {
-            case CONNECT -> connect(session, username, command);
+        switch (userGameCommand.getCommandType()) {
+            case CONNECT -> connect(session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
         }
     }
 
-    private void connect(Session session, String username, UserGameCommand command) throws Exception{
-        System.out.println("Inside connect");
-        var message = String.format("%s joined as a player", username);
-        System.out.println(message);
-        var serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, message);
-        connections.broadcast(command.getAuthToken(), serverMessage);
+    private void connect(Session session, String authToken, int gameID) throws Exception{
+        connections.add(gameID, authToken, session);
+        String username = service.getUsername(authToken);
+
+        GameData gameData = service.getGame(authToken, gameID);
+
+        var loadGame = new LoadGameMessage(gameData);
+        connections.send(authToken, loadGame);
+
+        var message = String.format("%s joined the game", username);
+        var notification = new NotficationMessage(message);
+        connections.broadcast(authToken, notification);
     }
 }

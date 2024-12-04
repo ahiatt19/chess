@@ -20,8 +20,6 @@ public class Server {
     WebSocketHandler webSocketHandler = new WebSocketHandler(service);
 
 
-
-
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 

@@ -17,12 +17,13 @@ import static ui.ChessBoardUI.main;
 public class ChessClient {
     private final ServerFacade server;
     private final String serverUrl;
-    private final ServerMessageHandler handler;
     private State state = State.SIGNEDOUT;
     private boolean inGameplay = false;
     private String authToken;
     private GamePlayUI gamePlayUI = new GamePlayUI();
     private boolean resigning = false;
+    private WebSocketFacade ws;
+    private final ServerMessageHandler handler;
 
     public ChessClient(String serverUrl, ServerMessageHandler handler) {
         server = new ServerFacade(serverUrl);
@@ -141,8 +142,10 @@ public class ChessClient {
             GameData gameData = server.getGame(authToken, gameID);
             ChessBoard chessBoard = gameData.game().getBoard();
             main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
+
             var ws = new WebSocketFacade(serverUrl, handler);
-            ws.joinGame(authToken, params[0].toUpperCase());
+            ws.connect(authToken, gameID);
+
             return "Joined Game " + params[1] + " as " + params[0].toUpperCase();
         }
         return "Include WHITE/BLACK and a game ID in your request";
