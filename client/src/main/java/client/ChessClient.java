@@ -139,10 +139,6 @@ public class ChessClient {
             gamePlayUI.setVars(gameID, params[1], params[0].toUpperCase(), UserType.PLAYER);
             inGameplay = true;
 
-            GameData gameData = server.getGame(authToken, gameID);
-            ChessBoard chessBoard = gameData.game().getBoard();
-            // main(gamePlayUI.getPlayerColor(), chessBoard, null, null);
-
             var ws = new WebSocketFacade(serverUrl, handler);
             ws.connect(authToken, gameID);
 
@@ -281,7 +277,7 @@ public class ChessClient {
                     ws.makeMove(authToken, gamePlayUI.getGameID(), move);
                 }
             }
-            return "Made Move " + params[0] + " to " + params[1];
+            // return "";
         }
         return "To Make a Move: move <1-8><a-h> <1-8><a-h>";
     }
