@@ -39,6 +39,7 @@ public class WebSocketHandler {
 
         switch (userGameCommand.getCommandType()) {
             case CONNECT -> connect(session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
+            case RESIGN -> resign(session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
         }
     }
 
@@ -61,6 +62,17 @@ public class WebSocketHandler {
             var json = gson.toJson(error);
             session.getRemote().sendString(json);
         }
+    }
+
+    private void resign(Session session, String authToken, int gameID) throws Exception{
+        System.out.println("resign");
+
+        String username = service.getUsername(authToken);
+        var message = String.format("%s resigned from the game", username);
+        var notification = new NotficationMessage(message);
+        connections.broadcastNotification("", notification);
+
+        connections.remove(authToken);
     }
 
     private void makeMove(Session session, String authToken, int gameID, ChessMove move) throws Exception {
