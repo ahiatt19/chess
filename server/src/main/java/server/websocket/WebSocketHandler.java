@@ -62,22 +62,29 @@ public class WebSocketHandler {
 
     private void makeMove(Session session, String authToken, int gameID, ChessMove move) throws Exception {
         System.out.println("MAKING MOVES B");
-        GameData game = service.getGame(authToken, gameID);
-        game.game().makeMove(move);
-        service.updateAGame(authToken, gameID, game.game());
+        if (service.getGame(authToken, gameID) != null) {
+            GameData game = service.getGame(authToken, gameID);
+            game.game().makeMove(move);
+            service.updateAGame(authToken, gameID, game.game());
 
-        //load game to all in session
-        var loadGame = new LoadGameMessage(game);
-        connections.broadcastNotification("", loadGame);
+            //load game to all in session
+            var loadGame = new LoadGameMessage(game);
+            connections.broadcastNotification("", loadGame);
 
-        String startCoor = move.getStartPosition().getRow() + letterCoor(move.getStartPosition().getColumn());
-        String endCoor = move.getEndPosition().getRow() + letterCoor(move.getEndPosition().getColumn());
+            String startCoor = move.getStartPosition().getRow() + letterCoor(move.getStartPosition().getColumn());
+            String endCoor = move.getEndPosition().getRow() + letterCoor(move.getEndPosition().getColumn());
 
-        //notification to all others
-        String username = service.getUsername(authToken);
-        var message = String.format("%s made the move %s to %s", username, startCoor, endCoor);
-        var notification = new NotficationMessage(message);
-        connections.broadcastNotification(authToken, notification);
+            //notification to all others
+            String username = service.getUsername(authToken);
+            var message = String.format("%s made the move %s to %s", username, startCoor, endCoor);
+            var notification = new NotficationMessage(message);
+            connections.broadcastNotification(authToken, notification);
+        } else {
+            var error = new ErrorMessage("There was an Error Making a Move");
+            Gson gson = new Gson();
+            var json = gson.toJson(error);
+            session.getRemote().sendString(json);
+        }
     }
 
     public String letterCoor(int itr) {
