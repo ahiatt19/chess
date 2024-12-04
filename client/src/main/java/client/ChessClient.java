@@ -162,15 +162,14 @@ public class ChessClient {
                     gameID = arr.get(i).gameID();
                 }
             }
+            inGameplay = true;
+            gamePlayUI.setVars(gameID, params[0], "WHITE", UserType.OBSERVER);
 
             var ws = new WebSocketFacade(serverUrl, handler);
             ws.connect(authToken, gameID);
-
-            inGameplay = true;
-            gamePlayUI.setVars(gameID, params[0], "WHITE", UserType.OBSERVER);
-            GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
-            ChessBoard chessBoard = gameData.game().getBoard();
-            main("WHITE", chessBoard, null, null);
+            // GameData gameData = server.getGame(authToken, gamePlayUI.getGameID());
+            // ChessBoard chessBoard = gameData.game().getBoard();
+            // main("WHITE", chessBoard, null, null);
             return "Observing Game ID: " + params[0];
         }
         return "Include game ID";

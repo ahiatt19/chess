@@ -43,16 +43,27 @@ public class WebSocketHandler {
     }
 
     private void connect(Session session, String authToken, int gameID) throws Exception{
-        if (service.getGame(authToken, gameID) != null) {
+        GameData gameData = service.getGame(authToken, gameID);
+        if (gameData != null) {
             connections.add(gameID, authToken, session);
             String username = service.getUsername(authToken);
-
-            GameData gameData = service.getGame(authToken, gameID);
+            ChessGame.TeamColor userColor = null;
+            if (Objects.equals(gameData.whiteUsername(), username)) {
+                userColor = ChessGame.TeamColor.WHITE;
+            } else if (Objects.equals(gameData.blackUsername(), username)) {
+                userColor = ChessGame.TeamColor.BLACK;
+            }
+            var message = "Something was Entered Incorrectly";
+            if (userColor != null) {
+                message = String.format("%s joined as player %s", username, userColor);
+            } else {
+                message = String.format("%s joined as an observer", username);
+            }
 
             var loadGame = new LoadGameMessage(gameData);
             connections.send(authToken, loadGame);
 
-            var message = String.format("%s joined the game", username);
+
             var notification = new NotficationMessage(message);
             connections.broadcast(authToken, notification, gameID);
         } else {
