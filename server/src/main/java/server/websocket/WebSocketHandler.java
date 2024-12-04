@@ -16,6 +16,7 @@ import websocket.messages.NotficationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @WebSocket
 public class WebSocketHandler {
@@ -78,12 +79,31 @@ public class WebSocketHandler {
                 }
             }
             if (goodMove) {
-                if (game.game().getBoard().getPiece(move.getStartPosition()).getTeamColor() != game.game().getTeamTurn()) {
+                ChessGame.TeamColor pieceColor = game.game().getBoard().getPiece(move.getStartPosition()).getTeamColor();
+                if (pieceColor != game.game().getTeamTurn()) {
                     var error = new ErrorMessage("It is " + game.game().getTeamTurn() + "'s turn");
                     Gson gson = new Gson();
                     var json = gson.toJson(error);
                     session.getRemote().sendString(json);
+                    return;
                 }
+                String username = service.getUsername(authToken);
+
+                ChessGame.TeamColor userColor = null;
+                if (Objects.equals(game.whiteUsername(), username)) {
+                    userColor = ChessGame.TeamColor.WHITE;
+                } else if (Objects.equals(game.blackUsername(), username)) {
+                    userColor = ChessGame.TeamColor.BLACK;
+                }
+
+                if (pieceColor != userColor) {
+                    var error = new ErrorMessage("You May Only Move " + userColor + " Pieces.");
+                    Gson gson = new Gson();
+                    var json = gson.toJson(error);
+                    session.getRemote().sendString(json);
+                    return;
+                }
+
                 game.game().makeMove(move);
                 service.updateAGame(authToken, gameID, game.game());
 
@@ -95,7 +115,7 @@ public class WebSocketHandler {
                 String endCoor = move.getEndPosition().getRow() + letterCoor(move.getEndPosition().getColumn());
 
                 //notification to all others
-                String username = service.getUsername(authToken);
+
                 var message = String.format("%s made the move %s to %s", username, startCoor, endCoor);
                 var notification = new NotficationMessage(message);
                 connections.broadcastNotification(authToken, notification);
