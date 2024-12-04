@@ -27,16 +27,25 @@ public class ConnectionManager {
         connections.remove(authToken);
     }
 
-    public void broadcastNotification(String excludeauthToken, NotficationMessage notification) throws Exception {
+    public void broadcastNotification(String excludeauthToken, ServerMessage message) throws Exception {
         var removeList = new ArrayList<Connection>();
-        //System.out.println("in broadcast");
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.authToken.equals(excludeauthToken)) {
-                    Gson gson = new Gson();
-                    var json = gson.toJson(notification);
-                    System.out.println(json);
-                    c.send(json);
+                    if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        var gsonBuilder = new GsonBuilder();
+                        gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameSerializer());
+                        var serializer = gsonBuilder.create();
+
+                        var loadGameJSON = serializer.toJson(message);
+                        System.out.println(loadGameJSON);
+                        c.send(loadGameJSON);
+                    } else {
+                        Gson gson = new Gson();
+                        var json = gson.toJson(message);
+                        System.out.println(json);
+                        c.send(json);
+                    }
                 }
             } else {
                 removeList.add(c);

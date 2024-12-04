@@ -1,6 +1,8 @@
 package client.websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
@@ -52,6 +54,17 @@ public class WebSocketFacade extends Endpoint {
             UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
             System.out.println(userGameCommand);
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (IOException ex) {
+            throw new Exception(ex.getMessage());
+        }
+    }
+
+    public void makeMove(String authToken, int gameID, ChessMove move) throws Exception {
+        try {
+            System.out.println("In makeMove in Web Socket Facade");
+            MakeMoveCommand makeMoveCommand = new MakeMoveCommand(authToken, gameID, move);
+            System.out.println(makeMoveCommand);
+            this.session.getBasicRemote().sendText(new Gson().toJson(makeMoveCommand));
         } catch (IOException ex) {
             throw new Exception(ex.getMessage());
         }

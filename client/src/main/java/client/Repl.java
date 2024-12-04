@@ -41,11 +41,6 @@ public class Repl implements ServerMessageHandler {
         System.out.println(RED + "message.");
         printPrompt();
     }
-/*
-    public void notifyNotif(NotficationMessage message) {
-        System.out.println(RED + message.);
-        printPrompt();
-    }*/
 
     private void printPrompt() {
         System.out.print("\n" + RESET + ">>> ");
