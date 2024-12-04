@@ -3,6 +3,7 @@ package server.websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
+import handler.obj.JoinGameRequest;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -39,6 +40,7 @@ public class WebSocketHandler {
         switch (userGameCommand.getCommandType()) {
             case CONNECT -> connect(session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
             case RESIGN -> resign(session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
+            case LEAVE -> leave(session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
         }
     }
 
@@ -64,8 +66,6 @@ public class WebSocketHandler {
     }
 
     private void resign(Session session, String authToken, int gameID) throws Exception{
-        System.out.println("resign");
-
         String username = service.getUsername(authToken);
         GameData gameData = service.getGame(authToken, gameID);
         if (gameData.game().getGameOver()) {
@@ -90,6 +90,34 @@ public class WebSocketHandler {
             connections.remove(authToken);
         } else {
             errMessage(session, "You Cannot Resign as an Observer");
+        }
+    }
+
+    private void leave(Session session, String authToken, int gameID) throws Exception {
+        System.out.println("leave");
+        String username = service.getUsername(authToken);
+        GameData gameData = service.getGame(authToken, gameID);
+
+        ChessGame.TeamColor userColor = null;
+        if (Objects.equals(gameData.whiteUsername(), username)) {
+            userColor = ChessGame.TeamColor.WHITE;
+        } else if (Objects.equals(gameData.blackUsername(), username)) {
+            userColor = ChessGame.TeamColor.BLACK;
+        }
+        if (userColor != null) {
+            System.out.println("we be in this ho");
+            service.leaveGame(gameID, userColor);
+
+            var message = String.format("Player %s left the game", username);
+            var notification = new NotficationMessage(message);
+            connections.broadcastNotification(authToken, notification);
+            connections.remove(authToken);
+        } else {
+
+            var message = String.format("Observer %s left the game", username);
+            var notification = new NotficationMessage(message);
+            connections.broadcastNotification(authToken, notification);
+            connections.remove(authToken);
         }
     }
 

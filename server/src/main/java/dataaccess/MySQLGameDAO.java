@@ -305,6 +305,25 @@ public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
         }
     }
 
+    public void leaveGame(int gameID, ChessGame.TeamColor color) throws DataAccessException {
+        String username = switch (color) {
+            case ChessGame.TeamColor.WHITE -> "white_username";
+            case ChessGame.TeamColor.BLACK -> "black_username";
+        };
+        var sql = "UPDATE games SET " + username + "=? WHERE gameID=?";
+
+        System.out.println(sql);
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(sql)) {
+                ps.setString(1, null);
+                ps.setInt(2, gameID);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", sql, e.getMessage()));
+        }
+    }
 
     private final String[] createStatements = {
             """

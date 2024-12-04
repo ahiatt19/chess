@@ -132,4 +132,8 @@ public class Service {
         AuthData authData = authDataAccess.getAuth(authToken);
         return authData.username();
     }
+
+    public void leaveGame(int gameID, ChessGame.TeamColor color) throws DataAccessException {
+        gameDataAccess.leaveGame(gameID, color);
+    }
 }

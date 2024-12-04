@@ -18,6 +18,8 @@ public interface GameDAO {
     void updateGame(int gameID, ChessGame game) throws DataAccessException;
 
     void clearGames() throws DataAccessException ;
+
+    void leaveGame(int gameID, ChessGame.TeamColor color) throws DataAccessException;
 }
 
 

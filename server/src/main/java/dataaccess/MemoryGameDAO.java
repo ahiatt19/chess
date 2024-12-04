@@ -32,6 +32,11 @@ public class MemoryGameDAO implements UserDAO, AuthDAO, GameDAO {
         currentGames = new ArrayList<>();
     }
 
+    @Override
+    public void leaveGame(int gameID, ChessGame.TeamColor color) throws DataAccessException{
+
+    }
+
 
     public void createUser(UserData u) {
         currentUsers.add(u);
