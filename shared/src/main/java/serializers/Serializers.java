@@ -1,4 +1,4 @@
-package jsonSerializers;
+package serializers;
 
 import chess.ChessBoard;
 import chess.ChessGame;

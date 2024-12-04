@@ -1,17 +1,15 @@
 package server;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.*;
 import handler.obj.*;
-import jsonSerializers.Serializers;
+import serializers.Serializers;
 import model.*;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.net.*;
 
-import static jsonSerializers.Serializers.createSerializer;
+import static serializers.Serializers.createSerializer;
 
 public class ServerFacade {
 

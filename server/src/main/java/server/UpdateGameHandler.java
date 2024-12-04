@@ -1,18 +1,15 @@
 package server;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.*;
 import dataaccess.DataAccessException;
-import handler.obj.UpdateGameRequest;
 import service.Service;
 import spark.Request;
 import spark.Response;
 
-import java.lang.reflect.Type;
 import java.util.Objects;
 
-import static jsonSerializers.Serializers.createSerializer;
+import static serializers.Serializers.createSerializer;
 
 public class UpdateGameHandler {
     private final Service service;

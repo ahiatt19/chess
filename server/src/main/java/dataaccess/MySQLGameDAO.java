@@ -1,6 +1,5 @@
 package dataaccess;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.*;
 import model.AuthData;
@@ -15,7 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import static jsonSerializers.Serializers.createSerializer;
+import static serializers.Serializers.createSerializer;
 
 public class MySQLGameDAO implements UserDAO, AuthDAO, GameDAO {
 
